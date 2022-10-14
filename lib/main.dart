@@ -1,15 +1,19 @@
+import 'package:fakestagram/data/repository.dart';
+import 'package:fakestagram/presentation/change_notifiers/posts_change_notifier.dart';
 import 'package:fakestagram/utils/assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import 'presentation/pages/navigation_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final _repository = FakestagramRepository();
+  MyApp({super.key, required});
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +24,19 @@ class MyApp extends StatelessWidget {
         primaryColor: AppColors.primaryColor,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.dark,
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<PostsChangeNotifier>(
+            create: (_) => PostsChangeNotifier(_repository),
+          )
+        ],
+        child: const AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.dark,
+          ),
+          child: NavigationPage(),
         ),
-        child: NavigationPage(),
       ),
     );
   }

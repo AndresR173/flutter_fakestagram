@@ -1,9 +1,9 @@
-import 'package:fakestagram/widgets/likes.dart';
-import 'package:fakestagram/widgets/random_image.dart';
-import 'package:fakestagram/widgets/user_image.dart';
+import 'package:fakestagram/presentation/widgets/likes.dart';
+import 'package:fakestagram/presentation/widgets/random_image.dart';
+import 'package:fakestagram/presentation/widgets/user_image.dart';
 import 'package:flutter/material.dart';
 
-import '../models/post.dart';
+import '../../models/post.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
@@ -29,7 +29,7 @@ class PostCard extends StatelessWidget {
   Widget buildImage() {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: RandomImage(media: post.media),
+      child: RandomImage(media: post.image),
     );
   }
 
@@ -42,14 +42,14 @@ class PostCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 8, left: 20),
                 child: UserImage(
-                  image: post.avatarImage,
+                  image: post.avatar,
                   radio: 16,
                   width: 38,
                 ),
               ),
-              Text(
-                post.accountName,
-                style: const TextStyle(
+              const Text(
+                'User name',
+                style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16),
