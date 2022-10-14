@@ -1,3 +1,4 @@
+import 'package:fakestagram/presentation/pages/feed_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/assets.dart';
@@ -70,9 +71,7 @@ class _NavigationPageState extends State<NavigationPage>
             body: TabBarView(
               controller: _tabController,
               children: [
-                Container(
-                  color: Colors.red,
-                ),
+                const FeedPage(),
                 Container(
                   color: Colors.blue,
                 ),

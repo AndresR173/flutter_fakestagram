@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fakestagram/presentation/widgets/likes.dart';
 import 'package:fakestagram/presentation/widgets/random_image.dart';
 import 'package:fakestagram/presentation/widgets/user_image.dart';
@@ -29,7 +31,8 @@ class PostCard extends StatelessWidget {
   Widget buildImage() {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: RandomImage(media: post.image),
+      child: RandomImage(
+          media: 'https://picsum.photos/id/${Random().nextInt(80)}/200'),
     );
   }
 
@@ -79,7 +82,7 @@ class PostCard extends StatelessWidget {
                 child: Icon(
                   Icons.favorite_border,
                   color: Colors.white,
-                  size: 35,
+                  size: 24,
                 ),
               ),
               Padding(
@@ -87,16 +90,24 @@ class PostCard extends StatelessWidget {
                 child: Icon(
                   Icons.chat_bubble_outline,
                   color: Colors.white,
-                  size: 35,
+                  size: 24,
                 ),
               ),
-              Icon(Icons.send, color: Colors.white, size: 35),
+              Icon(
+                Icons.send,
+                color: Colors.white,
+                size: 24,
+              ),
             ],
           ),
         ),
         const Padding(
           padding: EdgeInsets.only(right: 25),
-          child: Icon(Icons.save, color: Colors.white, size: 35),
+          child: Icon(
+            Icons.bookmark_outline,
+            color: Colors.white,
+            size: 24,
+          ),
         )
       ],
     );
