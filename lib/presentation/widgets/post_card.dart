@@ -1,11 +1,11 @@
 import 'dart:math';
 
-import 'package:fakestagram/presentation/widgets/likes.dart';
-import 'package:fakestagram/presentation/widgets/random_image.dart';
-import 'package:fakestagram/presentation/widgets/user_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/post.dart';
+import 'likes.dart';
+import 'random_image.dart';
+import 'user_image.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;

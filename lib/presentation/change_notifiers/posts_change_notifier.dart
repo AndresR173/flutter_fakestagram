@@ -1,6 +1,6 @@
-import 'package:fakestagram/data/repository.dart';
 import 'package:flutter/material.dart';
 
+import '../../data/repository.dart';
 import '../../models/post.dart';
 
 class PostsChangeNotifier extends ChangeNotifier {

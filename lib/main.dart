@@ -1,11 +1,11 @@
-import 'package:fakestagram/data/repository.dart';
-import 'package:fakestagram/presentation/change_notifiers/posts_change_notifier.dart';
-import 'package:fakestagram/utils/assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import 'data/repository.dart';
+import 'presentation/change_notifiers/posts_change_notifier.dart';
 import 'presentation/pages/navigation_page.dart';
+import 'utils/assets.dart';
 
 void main() {
   runApp(MyApp());

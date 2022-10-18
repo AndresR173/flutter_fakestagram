@@ -1,7 +1,7 @@
-import 'package:fakestagram/presentation/pages/feed_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/assets.dart';
+import 'feed_page.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
