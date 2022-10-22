@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/assets.dart';
+import 'account_page.dart';
 import 'feed_page.dart';
+import 'login_page.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -10,14 +12,15 @@ class NavigationPage extends StatefulWidget {
   State<NavigationPage> createState() => _NavigationPageState();
 }
 
-class _NavigationPageState extends State<NavigationPage>
-    with TickerProviderStateMixin {
+class _NavigationPageState extends State<NavigationPage> with TickerProviderStateMixin {
   late TabController _tabController;
+  bool _isLogged = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    // warning this could cause double callbacks
     _tabController.addListener(_handleTabSelection);
   }
 
@@ -75,9 +78,7 @@ class _NavigationPageState extends State<NavigationPage>
                 Container(
                   color: Colors.blue,
                 ),
-                Container(
-                  color: Colors.teal,
-                ),
+                if (_isLogged) const AccountPage() else const LoginPage()
               ],
             ),
             bottomNavigationBar: TabBar(

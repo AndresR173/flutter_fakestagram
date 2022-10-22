@@ -1,19 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/repository.dart';
+import 'presentation/change_notifiers/login_change_notifier.dart';
 import 'presentation/change_notifiers/posts_change_notifier.dart';
 import 'presentation/pages/navigation_page.dart';
 import 'utils/assets.dart';
 
-void main() {
-  runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final sharedPreferences = await SharedPreferences.getInstance();
+  final repository = FakestagramRepository(sharedPreferences);
+  final token = await repository.getAccessToken();
+  if (token != null) print('token: ${token.idToken}');
+
+  runApp(MyApp(repository: repository));
 }
 
 class MyApp extends StatelessWidget {
-  final _repository = FakestagramRepository();
-  MyApp({super.key, required});
+  final FakestagramRepository repository;
+
+  const MyApp({super.key, required this.repository});
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +36,11 @@ class MyApp extends StatelessWidget {
       home: MultiProvider(
         providers: [
           ChangeNotifierProvider<PostsChangeNotifier>(
-            create: (_) => PostsChangeNotifier(_repository),
-          )
+            create: (_) => PostsChangeNotifier(repository),
+          ),
+          ChangeNotifierProvider<LoginChangeNotifier>(
+            create: (_) => LoginChangeNotifier(repository),
+          ),
         ],
         child: const AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
