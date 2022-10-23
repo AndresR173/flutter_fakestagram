@@ -1,14 +1,16 @@
-import 'package:fakestagram/presentation/change_notifiers/future_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/assets.dart';
+import '../change_notifiers/future_state.dart';
 import '../change_notifiers/login_change_notifier.dart';
 import '../dialog/general_dialog.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final VoidCallback onLogin;
+  final VoidCallback onRegister;
+
+  const LoginPage({Key? key, required this.onLogin, required this.onRegister}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -23,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
       print('login status: ${provider.state}');
       switch (provider.state) {
         case FutureState.success:
+          widget.onLogin();
           showGenericDialog(context, 'Logged in!');
           break;
         case FutureState.failure:
@@ -69,6 +72,24 @@ class _LoginPageState extends State<LoginPage> {
               ElevatedButton(
                 child: const Text('Login'),
                 onPressed: () => changeNotifier.login(),
+              ),
+              const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Don\'t have an account?'),
+                  const SizedBox(width: 5),
+                  TextButton(
+                    onPressed: widget.onRegister,
+                    child: const Text(
+                      'Create Account',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

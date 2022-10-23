@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../utils/assets.dart';
 import 'account_page.dart';
+import 'create_account_page.dart';
 import 'feed_page.dart';
 import 'login_page.dart';
+
+enum _AccountPageState { createAccount, login, account }
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -14,7 +17,7 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> with TickerProviderStateMixin {
   late TabController _tabController;
-  bool _isLogged = false;
+  _AccountPageState accountPageState = _AccountPageState.login;
 
   @override
   void initState() {
@@ -22,6 +25,7 @@ class _NavigationPageState extends State<NavigationPage> with TickerProviderStat
     _tabController = TabController(length: 3, vsync: this);
     // warning this could cause double callbacks
     _tabController.addListener(_handleTabSelection);
+    // TODO check if user is logged in
   }
 
   @override
@@ -78,7 +82,12 @@ class _NavigationPageState extends State<NavigationPage> with TickerProviderStat
                 Container(
                   color: Colors.blue,
                 ),
-                if (_isLogged) const AccountPage() else const LoginPage()
+                if (accountPageState == _AccountPageState.account)
+                  const AccountPage()
+                else if (accountPageState == _AccountPageState.login)
+                  LoginPage(onLogin: () => null, onRegister: () => null)
+                else if (accountPageState == _AccountPageState.createAccount)
+                  CreateAccountPage(onRegister: (isAccountCreated) {}),
               ],
             ),
             bottomNavigationBar: TabBar(
