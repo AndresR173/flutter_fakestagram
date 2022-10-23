@@ -6,7 +6,7 @@ import 'create_account_page.dart';
 import 'feed_page.dart';
 import 'login_page.dart';
 
-enum _AccountPageState { createAccount, login, account }
+enum LoginSectionPageState { createAccount, login, account }
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -17,7 +17,7 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> with TickerProviderStateMixin {
   late TabController _tabController;
-  _AccountPageState accountPageState = _AccountPageState.login;
+  LoginSectionPageState accountPageState = LoginSectionPageState.login;
 
   @override
   void initState() {
@@ -82,11 +82,11 @@ class _NavigationPageState extends State<NavigationPage> with TickerProviderStat
                 Container(
                   color: Colors.blue,
                 ),
-                if (accountPageState == _AccountPageState.account)
+                if (accountPageState == LoginSectionPageState.account)
                   const AccountPage()
-                else if (accountPageState == _AccountPageState.login)
+                else if (accountPageState == LoginSectionPageState.login)
                   LoginPage(onLogin: () => null, onRegister: () => null)
-                else if (accountPageState == _AccountPageState.createAccount)
+                else if (accountPageState == LoginSectionPageState.createAccount)
                   CreateAccountPage(onRegister: (isAccountCreated) {}),
               ],
             ),
