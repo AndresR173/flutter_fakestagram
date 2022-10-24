@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/assets.dart';
+import '../widgets/fakestagram_app_bar.dart';
+import 'account_page.dart';
 import 'feed_page.dart';
 
 class NavigationPage extends StatefulWidget {
@@ -10,15 +12,16 @@ class NavigationPage extends StatefulWidget {
   State<NavigationPage> createState() => _NavigationPageState();
 }
 
-class _NavigationPageState extends State<NavigationPage>
-    with TickerProviderStateMixin {
+class _NavigationPageState extends State<NavigationPage> with TickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    // warning this could cause double callbacks
     _tabController.addListener(_handleTabSelection);
+    // TODO check if user is logged in
   }
 
   @override
@@ -40,34 +43,7 @@ class _NavigationPageState extends State<NavigationPage>
         child: SafeArea(
           child: Scaffold(
             backgroundColor: const Color(0xFF212121),
-            appBar: AppBar(
-              backgroundColor: AppColors.primaryColor,
-              centerTitle: false,
-              title: Image.asset(
-                Assets.titleImage,
-                height: 33,
-              ),
-              actions: <Widget>[
-                Image.asset(
-                  Assets.addOutline,
-                  height: 20,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(
-                    Icons.favorite_border,
-                    size: 24,
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(
-                    Icons.send,
-                    size: 24,
-                  ),
-                ),
-              ],
-            ),
+            appBar: FakestagramAppBar(),
             body: TabBarView(
               controller: _tabController,
               children: [
@@ -75,9 +51,7 @@ class _NavigationPageState extends State<NavigationPage>
                 Container(
                   color: Colors.blue,
                 ),
-                Container(
-                  color: Colors.teal,
-                ),
+                const AccountPage()
               ],
             ),
             bottomNavigationBar: TabBar(

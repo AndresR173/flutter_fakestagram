@@ -10,6 +10,7 @@ class Assets {
   static const String person = "assets/images/ic_person.png";
   static const String personOutline = "assets/images/ic_person_outline.png";
   static const String titleImage = "assets/images/instagram_title.png";
+  static const String logo = "assets/images/ic_app_logo.png";
 }
 
 class AppColors {

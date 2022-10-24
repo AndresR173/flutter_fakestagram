@@ -2,15 +2,20 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/auth_token.dart';
 import '../models/post.dart';
+import '../models/user_account.dart';
+import 'shared_preferences_keys.dart';
 
 class FakestagramRepository {
-  String? token;
+  final SharedPreferences _sharedPreferences;
+
+  FakestagramRepository(this._sharedPreferences);
 
   Future<List<Post>> getPosts() async {
-    final url = Uri.parse(
-        'https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
+    final url = Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
     final response = await http.get(url, headers: _getHeaders());
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
@@ -21,7 +26,16 @@ class FakestagramRepository {
     return [];
   }
 
-  Future<bool> authenticate(String email, String password) async {
+  Future<void> saveAccessToken(AuthToken token) => _sharedPreferences.setString(tokenPreferenceKey, jsonEncode(token));
+  Future<AuthToken?> getAccessToken() async {
+    final tokenJson = _sharedPreferences.getString(tokenPreferenceKey);
+    if (tokenJson == null) return null;
+    return AuthToken.fromJson(jsonDecode(tokenJson));
+  }
+  Future<void> deleteAccessToken() => _sharedPreferences.remove(tokenPreferenceKey);
+
+  Future<AuthToken?> authenticate(String email, String password) async {
+    AuthToken? authToken;
     final url = Uri.parse(
         'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCXo4VVDGqt0GmuklBvuYHPD3y72LVG4cg');
     final response = await http.post(
@@ -29,47 +43,38 @@ class FakestagramRepository {
       body: {
         'email': email,
         'password': password,
-        'returnSecureToken': true,
+        'returnSecureToken': 'true',
       },
     );
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
       final String? idToken = jsonResponse['idToken'];
-      if (idToken != null) {
-        token = idToken;
+      final String? refreshToken = jsonResponse['refreshToken'];
+      if (idToken != null && refreshToken != null) {
+        authToken = AuthToken();
+        authToken.idToken = idToken;
+        authToken.refreshToken = refreshToken;
       }
-      return true;
     }
-    return false;
+    return authToken;
   }
 
   Future<bool> createAccount(String email, String password) async {
-    final url = Uri.parse(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCXo4VVDGqt0GmuklBvuYHPD3y72LVG4cg');
+    final url = Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCXo4VVDGqt0GmuklBvuYHPD3y72LVG4cg');
     final response = await http.post(
       url,
       body: {
         'email': email,
         'password': password,
-        'returnSecureToken': true,
+        'returnSecureToken': 'true',
       },
     );
-
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-      final String? idToken = jsonResponse['idToken'];
-      if (idToken != null) {
-        token = idToken;
-      }
-      return true;
-    }
-    return false;
+    return response.statusCode == 200;
   }
 
   Future<bool> addPost(Map<String, dynamic> params) async {
-    final url = Uri.parse(
-        'https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
+    final url = Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
     final response = await http.post(url, body: params, headers: _getHeaders());
 
     return response.statusCode == 200;
@@ -77,11 +82,6 @@ class FakestagramRepository {
 
   Map<String, String> _getHeaders() {
     Map<String, String> headers = {};
-    headers['Authorization'] =
-        'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjVkMzQwZGRiYzNjNWJhY2M0Y2VlMWZiOWQxNmU5ODM3ZWM2MTYzZWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZmlyLXNhbmRib3gyLWU3NjAxIiwiYXVkIjoiZmlyLXNhbmRib3gyLWU3NjAxIiwiYXV0aF90aW1lIjoxNjY1NzcxNzc4LCJ1c2VyX2lkIjoiY1hEeE5Hc1l6bVRvZGF0UFo5cjRTWmRxMGJ2MSIsInN1YiI6ImNYRHhOR3NZem1Ub2RhdFBaOXI0U1pkcTBidjEiLCJpYXQiOjE2NjU3NzE3NzgsImV4cCI6MTY2NTc3NTM3OCwiZW1haWwiOiJhbmRyZXMucm9qYXNAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFuZHJlcy5yb2phc0BnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.yLESBnTFp-GJZLQRhyAVpqd1LU6zFUjqSVvoUkwCxnYoO7aHEayaG22sOtgu6xgpl281HeIQSbh6ufRPYaQ0xLlpqcQ9VCR45sAeHHuDVCRSkqBWZqicYNaCZ9G53M0987oTToMeursRy1AsEFej53ZS8Cb5FoqhV_42JjjJKvNaN4x6XSUQfJoSxOcUIMzcPR5ZuW4GRSjlWuwe2eXm2lfZTuDdvjT7WZfREpoEzvHwhZGgwf0QDUMzzwEmyyLAQWDL96108XP_RYWDj0dIkeo0qF8wkLBR3L81fkNwzcVRejbMR-HzO1V8OQXrCTFY5z50IpRFJTaYq7xBaEmVkw';
-    if (token != null) {
-      headers['Authorization'] = 'Bearer ${token!}';
-    }
 
     return headers;
   }
@@ -95,5 +95,17 @@ class FakestagramRepository {
     );
 
     return post;
+  }
+
+  Future<bool> isUserLoggedIn() async {
+    final token = await getAccessToken();
+    return token != null;
+  }
+
+  Future<void> saveUserAccount(UserAccount userAccount) => _sharedPreferences.setString(userAccountPreferenceKey, jsonEncode(userAccount));
+  Future<UserAccount?> getUserAccount() async {
+    final userAccountJson = _sharedPreferences.getString(userAccountPreferenceKey);
+    if (userAccountJson == null) return null;
+    return UserAccount.fromJson(jsonDecode(userAccountJson));
   }
 }
