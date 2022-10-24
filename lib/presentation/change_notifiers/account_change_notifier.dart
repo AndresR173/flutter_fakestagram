@@ -24,8 +24,6 @@ class AccountChangeNotifier extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    _logoutActionState = FutureState.wait;
-    notifyListeners();
     await _repository.deleteAccessToken();
     _logoutActionState = FutureState.success;
     notifyListeners();

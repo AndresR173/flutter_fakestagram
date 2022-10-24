@@ -21,13 +21,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     provider.addListener(() {
       switch (provider.state) {
         case FutureState.success:
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account created')));
           break;
         case FutureState.failure:
+          if (!mounted) return;
           Navigator.pop(context);
           showGenericDialog(context, 'error: ${provider.error}', title: 'Error');
           break;
         case FutureState.wait:
+          if (!mounted) return;
           showProgressDialog(context);
           break;
         default:

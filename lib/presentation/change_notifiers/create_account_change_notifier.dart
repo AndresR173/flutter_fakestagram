@@ -32,6 +32,9 @@ class CreateAccountChangeNotifier extends ChangeNotifier {
   }
 
   Future<void> createAccount() async {
+    _state = FutureState.wait;
+    notifyListeners();
+
     if (_email == null || _password == null) {
       _state = FutureState.failure;
       _error = Exception('Email and password cannot be null');
@@ -43,9 +46,6 @@ class CreateAccountChangeNotifier extends ChangeNotifier {
       notifyListeners();
       return;
     }
-
-    _state = FutureState.wait;
-    notifyListeners();
 
     try {
       final isAccountCreated = await _repository.createAccount(_email!, _password!);

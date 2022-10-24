@@ -21,14 +21,15 @@ class _AccountPageState extends State<AccountPage> {
     provider.addListener(() {
       switch (provider.logoutActionState) {
         case FutureState.success:
+          if (!mounted) return;
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (_) => const LoginPage()),
             (route) => false,
           );
-
           break;
         case FutureState.wait:
+          if (!mounted) return;
           showProgressDialog(context);
           break;
         default:

@@ -25,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
     provider.addListener(() {
       switch (provider.loginActionState) {
         case FutureState.success:
+          if (!mounted) return;
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (_) => const NavigationPage()),
@@ -32,10 +33,12 @@ class _LoginPageState extends State<LoginPage> {
           );
           break;
         case FutureState.failure:
+          if (!mounted) return;
           Navigator.pop(context);
           showGenericDialog(context, 'error: ${provider.error}', title: 'Error');
           break;
         case FutureState.wait:
+          if (!mounted) return;
           showProgressDialog(context);
           break;
         default:
