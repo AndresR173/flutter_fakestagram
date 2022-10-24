@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/auth_token.dart';
 import '../models/post.dart';
+import '../models/user_account.dart';
 import 'shared_preferences_keys.dart';
 
 class FakestagramRepository {
@@ -27,10 +28,11 @@ class FakestagramRepository {
 
   Future<void> saveAccessToken(AuthToken token) => _sharedPreferences.setString(tokenPreferenceKey, jsonEncode(token));
   Future<AuthToken?> getAccessToken() async {
-    final token = _sharedPreferences.getString(tokenPreferenceKey);
-    if (token == null) return null;
-    return AuthToken.fromJson(jsonDecode(token));
+    final tokenJson = _sharedPreferences.getString(tokenPreferenceKey);
+    if (tokenJson == null) return null;
+    return AuthToken.fromJson(jsonDecode(tokenJson));
   }
+  Future<void> deleteAccessToken() => _sharedPreferences.remove(tokenPreferenceKey);
 
   Future<AuthToken?> authenticate(String email, String password) async {
     AuthToken? authToken;
@@ -65,11 +67,10 @@ class FakestagramRepository {
       body: {
         'email': email,
         'password': password,
-        'returnSecureToken': true,
+        'returnSecureToken': 'true',
       },
     );
-
-    return true;
+    return response.statusCode == 200;
   }
 
   Future<bool> addPost(Map<String, dynamic> params) async {
@@ -94,5 +95,17 @@ class FakestagramRepository {
     );
 
     return post;
+  }
+
+  Future<bool> isUserLoggedIn() async {
+    final token = await getAccessToken();
+    return token != null;
+  }
+
+  Future<void> saveUserAccount(UserAccount userAccount) => _sharedPreferences.setString(userAccountPreferenceKey, jsonEncode(userAccount));
+  Future<UserAccount?> getUserAccount() async {
+    final userAccountJson = _sharedPreferences.getString(userAccountPreferenceKey);
+    if (userAccountJson == null) return null;
+    return UserAccount.fromJson(jsonDecode(userAccountJson));
   }
 }

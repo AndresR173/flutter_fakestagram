@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/assets.dart';
+import '../widgets/fakestagram_app_bar.dart';
 import 'account_page.dart';
-import 'create_account_page.dart';
 import 'feed_page.dart';
-import 'login_page.dart';
-
-enum LoginSectionPageState { createAccount, login, account }
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -17,7 +14,6 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> with TickerProviderStateMixin {
   late TabController _tabController;
-  LoginSectionPageState accountPageState = LoginSectionPageState.login;
 
   @override
   void initState() {
@@ -47,34 +43,7 @@ class _NavigationPageState extends State<NavigationPage> with TickerProviderStat
         child: SafeArea(
           child: Scaffold(
             backgroundColor: const Color(0xFF212121),
-            appBar: AppBar(
-              backgroundColor: AppColors.primaryColor,
-              centerTitle: false,
-              title: Image.asset(
-                Assets.titleImage,
-                height: 33,
-              ),
-              actions: <Widget>[
-                Image.asset(
-                  Assets.addOutline,
-                  height: 20,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(
-                    Icons.favorite_border,
-                    size: 24,
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(
-                    Icons.send,
-                    size: 24,
-                  ),
-                ),
-              ],
-            ),
+            appBar: FakestagramAppBar(),
             body: TabBarView(
               controller: _tabController,
               children: [
@@ -82,12 +51,7 @@ class _NavigationPageState extends State<NavigationPage> with TickerProviderStat
                 Container(
                   color: Colors.blue,
                 ),
-                if (accountPageState == LoginSectionPageState.account)
-                  const AccountPage()
-                else if (accountPageState == LoginSectionPageState.login)
-                  LoginPage(onLogin: () => null, onRegister: () => null)
-                else if (accountPageState == LoginSectionPageState.createAccount)
-                  CreateAccountPage(onRegister: (isAccountCreated) {}),
+                const AccountPage()
               ],
             ),
             bottomNavigationBar: TabBar(
