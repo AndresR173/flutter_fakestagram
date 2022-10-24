@@ -5,6 +5,7 @@ import '../change_notifiers/create_account_change_notifier.dart';
 import '../change_notifiers/future_state.dart';
 import '../dialog/general_dialog.dart';
 import '../widgets/fakestagram_app_bar.dart';
+import 'navigation_page.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -22,13 +23,18 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     provider.addListener(() {
       switch (provider.state) {
         case FutureState.success:
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account created')));
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const NavigationPage()),
+              (route) => false);
           break;
         case FutureState.failure:
           if (!mounted) return;
           Navigator.pop(context);
-          showGenericDialog(context, 'error: ${provider.error}', title: 'Error');
+          showGenericDialog(
+            context,
+            'error: ${provider.error}',
+            title: 'Error',
+          );
           break;
         case FutureState.wait:
           if (!mounted) return;
@@ -46,11 +52,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Consumer<CreateAccountChangeNotifier>(builder: (_, changeNotifier, __) {
+          child: Consumer<CreateAccountChangeNotifier>(
+              builder: (_, changeNotifier, __) {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Create Account', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text('Create Account',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(
                   height: 20,
                 ),
@@ -77,7 +86,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ),
                 TextField(
                   obscureText: true,
-                  onChanged: (text) => changeNotifier.setPasswordConfirmation(text),
+                  onChanged: (text) =>
+                      changeNotifier.setPasswordConfirmation(text),
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Confirm Password',

@@ -12,16 +12,15 @@ class NavigationPage extends StatefulWidget {
   State<NavigationPage> createState() => _NavigationPageState();
 }
 
-class _NavigationPageState extends State<NavigationPage> with TickerProviderStateMixin {
+class _NavigationPageState extends State<NavigationPage>
+    with TickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    // warning this could cause double callbacks
     _tabController.addListener(_handleTabSelection);
-    // TODO check if user is logged in
   }
 
   @override
@@ -31,69 +30,66 @@ class _NavigationPageState extends State<NavigationPage> with TickerProviderStat
   }
 
   _handleTabSelection() {
-    setState(() {});
+    if (_tabController.indexIsChanging) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      child: Container(
-        color: const Color(0xFF212121),
-        child: SafeArea(
-          child: Scaffold(
-            backgroundColor: const Color(0xFF212121),
-            appBar: FakestagramAppBar(),
-            body: TabBarView(
-              controller: _tabController,
-              children: [
-                const FeedPage(),
-                Container(
-                  color: Colors.blue,
-                ),
-                const AccountPage()
-              ],
+      child: Scaffold(
+        backgroundColor: const Color(0xFF212121),
+        appBar: FakestagramAppBar(),
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            const FeedPage(),
+            Container(
+              color: Colors.blue,
             ),
-            bottomNavigationBar: TabBar(
-              controller: _tabController,
-              tabs: [
-                Tab(
-                  icon: _tabController.index == 0
-                      ? Image.asset(
-                          Assets.home,
-                          height: 24,
-                        )
-                      : Image.asset(
-                          Assets.homeOutline,
-                          height: 24,
-                        ),
-                ),
-                Tab(
-                  icon: _tabController.index == 1
-                      ? Image.asset(
-                          Assets.search,
-                          height: 24,
-                        )
-                      : Image.asset(
-                          Assets.searchOutline,
-                          height: 24,
-                        ),
-                ),
-                Tab(
-                  icon: _tabController.index == 2
-                      ? Image.asset(
-                          Assets.person,
-                          height: 24,
-                        )
-                      : Image.asset(
-                          Assets.personOutline,
-                          height: 24,
-                        ),
-                ),
-              ],
-              indicatorColor: Colors.transparent,
+            const AccountPage()
+          ],
+        ),
+        bottomNavigationBar: TabBar(
+          controller: _tabController,
+          tabs: [
+            Tab(
+              icon: _tabController.index == 0
+                  ? Image.asset(
+                      Assets.home,
+                      height: 24,
+                    )
+                  : Image.asset(
+                      Assets.homeOutline,
+                      height: 24,
+                    ),
             ),
-          ),
+            Tab(
+              icon: _tabController.index == 1
+                  ? Image.asset(
+                      Assets.search,
+                      height: 24,
+                    )
+                  : Image.asset(
+                      Assets.searchOutline,
+                      height: 24,
+                    ),
+            ),
+            Tab(
+              icon: _tabController.index == 2
+                  ? Image.asset(
+                      Assets.person,
+                      height: 24,
+                    )
+                  : Image.asset(
+                      Assets.personOutline,
+                      height: 24,
+                    ),
+            ),
+          ],
+          indicatorColor: Colors.transparent,
         ),
       ),
     );

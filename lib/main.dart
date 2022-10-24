@@ -1,4 +1,3 @@
-import 'package:fakestagram/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +8,7 @@ import 'presentation/change_notifiers/account_change_notifier.dart';
 import 'presentation/change_notifiers/create_account_change_notifier.dart';
 import 'presentation/change_notifiers/login_change_notifier.dart';
 import 'presentation/change_notifiers/posts_change_notifier.dart';
+import 'presentation/pages/login_page.dart';
 import 'presentation/pages/navigation_page.dart';
 import 'utils/assets.dart';
 

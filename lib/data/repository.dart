@@ -11,12 +11,17 @@ import 'shared_preferences_keys.dart';
 
 class FakestagramRepository {
   final SharedPreferences _sharedPreferences;
+  String? _token;
 
   FakestagramRepository(this._sharedPreferences);
 
   Future<List<Post>> getPosts() async {
-    final url = Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
-    final response = await http.get(url, headers: _getHeaders());
+    final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
+    final response = await http.get(
+      url,
+      headers: await _getHeaders(),
+    );
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
       final documents = jsonResponse['documents'] as List<dynamic>;
@@ -26,13 +31,17 @@ class FakestagramRepository {
     return [];
   }
 
-  Future<void> saveAccessToken(AuthToken token) => _sharedPreferences.setString(tokenPreferenceKey, jsonEncode(token));
+  Future<void> saveAccessToken(AuthToken token) =>
+      _sharedPreferences.setString(tokenPreferenceKey, jsonEncode(token));
+
   Future<AuthToken?> getAccessToken() async {
     final tokenJson = _sharedPreferences.getString(tokenPreferenceKey);
     if (tokenJson == null) return null;
     return AuthToken.fromJson(jsonDecode(tokenJson));
   }
-  Future<void> deleteAccessToken() => _sharedPreferences.remove(tokenPreferenceKey);
+
+  Future<void> deleteAccessToken() =>
+      _sharedPreferences.remove(tokenPreferenceKey);
 
   Future<AuthToken?> authenticate(String email, String password) async {
     AuthToken? authToken;
@@ -52,16 +61,18 @@ class FakestagramRepository {
       final String? idToken = jsonResponse['idToken'];
       final String? refreshToken = jsonResponse['refreshToken'];
       if (idToken != null && refreshToken != null) {
-        authToken = AuthToken();
-        authToken.idToken = idToken;
-        authToken.refreshToken = refreshToken;
+        authToken = AuthToken(
+          idToken: idToken,
+          refreshToken: refreshToken,
+        );
       }
     }
     return authToken;
   }
 
   Future<bool> createAccount(String email, String password) async {
-    final url = Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCXo4VVDGqt0GmuklBvuYHPD3y72LVG4cg');
+    final url = Uri.parse(
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCXo4VVDGqt0GmuklBvuYHPD3y72LVG4cg');
     final response = await http.post(
       url,
       body: {
@@ -70,18 +81,46 @@ class FakestagramRepository {
         'returnSecureToken': 'true',
       },
     );
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+      final String? idToken = jsonResponse['idToken'];
+      final String? refreshToken = jsonResponse['refreshToken'];
+      if (idToken != null && refreshToken != null) {
+        final authToken = AuthToken(
+          idToken: idToken,
+          refreshToken: refreshToken,
+        );
+        await saveAccessToken(authToken);
+      }
+      return true;
+    }
+    return false;
   }
 
   Future<bool> addPost(Map<String, dynamic> params) async {
-    final url = Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
-    final response = await http.post(url, body: params, headers: _getHeaders());
+    final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
+    final response = await http.post(
+      url,
+      body: params,
+      headers: await _getHeaders(),
+    );
 
     return response.statusCode == 200;
   }
 
-  Map<String, String> _getHeaders() {
+  Future<Map<String, String>> _getHeaders() async {
     Map<String, String> headers = {};
+
+    if (_token != null) {
+      headers['Authorization'] = 'Bearer $_token';
+    } else {
+      final token = await getAccessToken();
+      if (token != null) {
+        _token = token.idToken;
+        headers['Authorization'] = 'Bearer $_token';
+      }
+    }
 
     return headers;
   }
@@ -102,9 +141,12 @@ class FakestagramRepository {
     return token != null;
   }
 
-  Future<void> saveUserAccount(UserAccount userAccount) => _sharedPreferences.setString(userAccountPreferenceKey, jsonEncode(userAccount));
+  Future<void> saveUserAccount(UserAccount userAccount) => _sharedPreferences
+      .setString(userAccountPreferenceKey, jsonEncode(userAccount));
+
   Future<UserAccount?> getUserAccount() async {
-    final userAccountJson = _sharedPreferences.getString(userAccountPreferenceKey);
+    final userAccountJson =
+        _sharedPreferences.getString(userAccountPreferenceKey);
     if (userAccountJson == null) return null;
     return UserAccount.fromJson(jsonDecode(userAccountJson));
   }
