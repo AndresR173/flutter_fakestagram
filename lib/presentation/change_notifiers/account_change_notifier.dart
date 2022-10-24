@@ -15,10 +15,15 @@ class AccountChangeNotifier extends ChangeNotifier {
   FutureState get logoutActionState => _logoutActionState;
 
   AccountChangeNotifier(this._repository) {
-    _init();
+    _fetchUser();
   }
 
-  Future<void> _init() async {
+  void init() {
+    _logoutActionState = FutureState.none;
+    _userAccount = null;
+  }
+
+  Future<void> _fetchUser() async {
     _userAccount = await _repository.getUserAccount();
     notifyListeners();
   }

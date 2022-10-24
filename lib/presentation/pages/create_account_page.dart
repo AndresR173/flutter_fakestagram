@@ -18,6 +18,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   void initState() {
     super.initState();
     final provider = context.read<CreateAccountChangeNotifier>();
+    provider.init();
     provider.addListener(() {
       switch (provider.state) {
         case FutureState.success:

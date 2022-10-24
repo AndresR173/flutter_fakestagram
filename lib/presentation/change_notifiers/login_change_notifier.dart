@@ -21,6 +21,8 @@ class LoginChangeNotifier extends ChangeNotifier {
   void init() {
     _loginActionState = FutureState.none;
     _error = null;
+    _email = null;
+    _password = null;
   }
 
   void setEmail(String email) {
@@ -30,6 +32,7 @@ class LoginChangeNotifier extends ChangeNotifier {
   void setPassword(String password) {
     _password = password;
   }
+
 
   Future<void> login() async {
     _loginActionState = FutureState.wait;

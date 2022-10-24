@@ -19,6 +19,13 @@ class CreateAccountChangeNotifier extends ChangeNotifier {
 
   dynamic get error => _error;
 
+  void init() {
+    _state = FutureState.none;
+    _error = null;
+    _email = null;
+    _password = null;
+  }
+
   void setEmail(String email) {
     _email = email;
   }

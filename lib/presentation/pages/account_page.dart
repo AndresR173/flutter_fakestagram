@@ -18,6 +18,7 @@ class _AccountPageState extends State<AccountPage> {
   void initState() {
     super.initState();
     final provider = context.read<AccountChangeNotifier>();
+    provider.init();
     provider.addListener(() {
       switch (provider.logoutActionState) {
         case FutureState.success:
