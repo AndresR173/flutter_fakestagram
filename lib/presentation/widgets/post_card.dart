@@ -9,10 +9,14 @@ import 'user_image.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
+  final VoidCallback onComment;
+  final VoidCallback onLike;
 
   const PostCard({
     super.key,
     required this.post,
+    required this.onComment,
+    required this.onLike,
   });
 
   @override
@@ -23,7 +27,8 @@ class PostCard extends StatelessWidget {
         buildHeader(),
         buildImage(),
         buildActions(),
-        buildLikes()
+        buildLikes(),
+        if (post.comments?.isNotEmpty == true) buildComments(),
       ]),
     );
   }
@@ -31,17 +36,16 @@ class PostCard extends StatelessWidget {
   Widget buildImage() {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: RandomImage(
-          media: 'https://picsum.photos/id/${Random().nextInt(80)}/200'),
+      child: RandomImage(media: 'https://picsum.photos/id/${Random().nextInt(80)}/200'),
     );
   }
 
   Widget buildHeader() {
     return Row(
-      children: <Widget>[
+      children: [
         Expanded(
           child: Row(
-            children: <Widget>[
+            children: [
               Padding(
                 padding: const EdgeInsets.only(right: 8, left: 20),
                 child: UserImage(
@@ -52,10 +56,7 @@ class PostCard extends StatelessWidget {
               ),
               const Text(
                 'User name',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ],
           ),
@@ -73,27 +74,33 @@ class PostCard extends StatelessWidget {
 
   Widget buildActions() {
     return Row(
-      children: <Widget>[
+      children: [
         Expanded(
           child: Row(
-            children: const <Widget>[
+            children: [
               Padding(
-                padding: EdgeInsets.only(right: 10, left: 20),
-                child: Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                  size: 24,
+                padding: const EdgeInsets.only(right: 10, left: 20),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.favorite_border,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  onPressed: onLike,
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: Icon(
-                  Icons.chat_bubble_outline,
-                  color: Colors.white,
-                  size: 24,
+                padding: const EdgeInsets.only(right: 10),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.chat_bubble_outline,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  onPressed: onComment,
                 ),
               ),
-              Icon(
+              const Icon(
                 Icons.send,
                 color: Colors.white,
                 size: 24,
@@ -123,4 +130,6 @@ class PostCard extends StatelessWidget {
       ],
     );
   }
+
+  Widget buildComments() => Text('View all ${post.comments?.length} comments');
 }

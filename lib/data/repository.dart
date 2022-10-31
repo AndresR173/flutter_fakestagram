@@ -51,6 +51,7 @@ class FakestagramRepository {
     );
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+      if (jsonResponse.isEmpty) return null;
       final documents = jsonResponse['documents'] as List<dynamic>;
       return documents.map((document) => _getComment(document)).toList();
     }
