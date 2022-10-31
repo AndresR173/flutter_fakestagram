@@ -76,7 +76,7 @@ class _FeedPageState extends State<FeedPage> {
                       ),
                     );
                   },
-                  onLike: () {},
+                  onLike: () {}, accountEmail: changeNotifier.userAccount?.email,
                 );
               },
               itemCount: posts.length,

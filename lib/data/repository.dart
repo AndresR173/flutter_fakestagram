@@ -14,6 +14,7 @@ import 'shared_preferences_keys.dart';
 class FakestagramRepository {
   final SharedPreferences _sharedPreferences;
   String? _token;
+  UserAccount? _account;
 
   FakestagramRepository(this._sharedPreferences);
 
@@ -159,8 +160,8 @@ class FakestagramRepository {
       id: id,
       image: data['fields']['imageBase64']['stringValue'],
       header: data['fields']['header']['stringValue'],
-      isLiked: data['fields']['isLiked']['booleanValue'],
       avatar: 'https://picsum.photos/600?image=${Random().nextInt(80)}',
+      likedBy: data['fields']['likedBy']['arrayValue']['values'].map((item) => item['stringValue']).toList(),
     );
 
     return post;
@@ -176,6 +177,9 @@ class FakestagramRepository {
 
   Future<bool> isUserLoggedIn() async {
     final token = await getAccessToken();
+    final user = await getUserAccount();
+    _token = token?.idToken;
+    _account = user;
     return token != null;
   }
 
@@ -187,4 +191,6 @@ class FakestagramRepository {
     if (userAccountJson == null) return null;
     return UserAccount.fromJson(jsonDecode(userAccountJson));
   }
+
+  UserAccount? getAccountEmail() => _account;
 }
