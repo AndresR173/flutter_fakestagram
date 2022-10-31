@@ -23,13 +23,17 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 15),
-      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        buildHeader(),
-        buildImage(),
-        buildActions(),
-        buildLikes(),
-        if (post.comments?.isNotEmpty == true) buildComments(),
-      ]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildHeader(),
+          buildImage(),
+          buildActions(),
+          buildLikes(),
+          if (post.comments?.isNotEmpty == true) buildComments(),
+        ],
+      ),
     );
   }
 
@@ -79,8 +83,8 @@ class PostCard extends StatelessWidget {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(
-                  Icons.favorite_border,
+                icon: Icon(
+                  post.isLiked ? Icons.favorite : Icons.favorite_border,
                   color: Colors.white,
                   size: 24,
                 ),
@@ -92,7 +96,7 @@ class PostCard extends StatelessWidget {
                   color: Colors.white,
                   size: 24,
                 ),
-                onPressed: onComment,
+                onPressed: post.comments?.isNotEmpty == true ? onComment : null,
               ),
               IconButton(
                 icon: const Icon(
@@ -125,10 +129,13 @@ class PostCard extends StatelessWidget {
   }
 
   Widget buildComments() => Padding(
-    padding: const EdgeInsets.only(left: 20, top: 5),
-    child: Text(
-          'View all ${post.comments?.length} comments',
-          style: const TextStyle(color: Colors.white),
+        padding: const EdgeInsets.only(left: 20, top: 5),
+        child: TextButton(
+            onPressed: post.comments?.isNotEmpty == true ? onComment : null,
+            child: Text(
+            'View all ${post.comments?.length} comments',
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
-  );
+      );
 }

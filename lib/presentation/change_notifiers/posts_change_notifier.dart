@@ -40,5 +40,16 @@ class PostsChangeNotifier extends ChangeNotifier {
     }
   }
 
+  Future<void> likePost(Post post) async {
+
+  }
+
+
+  Future<void> commentPost(Post post, String comment) async {
+
+  }
+
+
+
   Future<void> deleteSession() => _repository.deleteAccessToken();
 }

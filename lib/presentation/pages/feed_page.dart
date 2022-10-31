@@ -9,6 +9,7 @@ import '../change_notifiers/future_state.dart';
 import '../change_notifiers/posts_change_notifier.dart';
 import '../dialog/general_dialog.dart';
 import '../widgets/post_card.dart';
+import 'comments_page.dart';
 import 'login_page.dart';
 
 class FeedPage extends StatefulWidget {
@@ -23,7 +24,6 @@ class _FeedPageState extends State<FeedPage> {
   void initState() {
     super.initState();
     final provider = context.read<PostsChangeNotifier>();
-    provider.init();
     provider.addListener(() {
       if (provider.fetchPostsState == FutureState.failure) {
         if (provider.error is UnauthorizedException) {
@@ -47,7 +47,7 @@ class _FeedPageState extends State<FeedPage> {
         }
       }
     });
-    provider.getPosts();
+    fetchPosts(provider);
   }
 
   @override
@@ -63,7 +63,19 @@ class _FeedPageState extends State<FeedPage> {
                 final post = posts[index];
                 return PostCard(
                   post: post,
-                  onComment: () {},
+                  onComment: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CommentsPage(
+                          comments: post.comments!,
+                          onNewComment: (String comment) {
+                            changeNotifier.commentPost(post, comment);
+                          },
+                        ),
+                      ),
+                    );
+                  },
                   onLike: () {},
                 );
               },
@@ -78,5 +90,9 @@ class _FeedPageState extends State<FeedPage> {
       ),
     );
   }
-}
 
+  void fetchPosts(PostsChangeNotifier provider) {
+    provider.init();
+    provider.getPosts();
+  }
+}

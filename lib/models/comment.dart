@@ -1,5 +1,6 @@
 class Comment {
-  final String? text;
+  final String text;
+  final String author;
 
-  Comment({this.text});
+  Comment({required this.author, required this.text});
 }

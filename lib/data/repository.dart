@@ -167,7 +167,10 @@ class FakestagramRepository {
   }
 
   Comment _getComment(Map data) {
-    final comment = Comment(text: data['fields']['text']['stringValue']);
+    final comment = Comment(
+      text: data['fields']['text']['stringValue'],
+      author: data['fields']['author']['stringValue'],
+    );
     return comment;
   }
 
