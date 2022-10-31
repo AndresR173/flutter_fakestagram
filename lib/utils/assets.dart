@@ -15,4 +15,5 @@ class Assets {
 
 class AppColors {
   static const primaryColor = Color(0xFF212121);
+  static const fiord = Color(0xFF394D5F);
 }
