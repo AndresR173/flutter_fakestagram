@@ -66,7 +66,10 @@ class FakestagramRepository {
     return AuthToken.fromJson(jsonDecode(tokenJson));
   }
 
-  Future<void> deleteAccessToken() => _sharedPreferences.remove(tokenPreferenceKey);
+  Future<void> deleteAccessToken() async {
+    _token = null;
+    await _sharedPreferences.remove(tokenPreferenceKey);
+  }
 
   Future<AuthToken?> authenticate(String email, String password) async {
     AuthToken? authToken;

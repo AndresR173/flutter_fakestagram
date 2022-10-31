@@ -23,7 +23,7 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 15),
-      child: Column(children: <Widget>[
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         buildHeader(),
         buildImage(),
         buildActions(),
@@ -78,32 +78,29 @@ class PostCard extends StatelessWidget {
         Expanded(
           child: Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 10, left: 20),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.favorite_border,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                  onPressed: onLike,
+              IconButton(
+                icon: const Icon(
+                  Icons.favorite_border,
+                  color: Colors.white,
+                  size: 24,
                 ),
+                onPressed: onLike,
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.chat_bubble_outline,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                  onPressed: onComment,
+              IconButton(
+                icon: const Icon(
+                  Icons.chat_bubble_outline,
+                  color: Colors.white,
+                  size: 24,
                 ),
+                onPressed: onComment,
               ),
-              const Icon(
-                Icons.send,
-                color: Colors.white,
-                size: 24,
+              IconButton(
+                icon: const Icon(
+                  Icons.send,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: () {},
               ),
             ],
           ),
@@ -121,15 +118,17 @@ class PostCard extends StatelessWidget {
   }
 
   Widget buildLikes() {
-    return Row(
-      children: const <Widget>[
-        Padding(
-          padding: EdgeInsets.only(left: 20, top: 5),
-          child: Likes(),
-        ),
-      ],
+    return const Padding(
+      padding: EdgeInsets.only(left: 20, top: 5),
+      child: Likes(),
     );
   }
 
-  Widget buildComments() => Text('View all ${post.comments?.length} comments');
+  Widget buildComments() => Padding(
+    padding: const EdgeInsets.only(left: 20, top: 5),
+    child: Text(
+          'View all ${post.comments?.length} comments',
+          style: const TextStyle(color: Colors.white),
+        ),
+  );
 }
