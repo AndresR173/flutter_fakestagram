@@ -59,6 +59,72 @@ class FakestagramRepository {
     return null;
   }
 
+  Future<bool> postNewEntry(Post post) async {
+    final url = Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
+    final response = await http.post(
+      url,
+      headers: await _getHeaders(),
+      body: jsonEncode({
+        'fields': {
+          'author': {'stringValue': post.author},
+          'header': {'stringValue': post.header},
+          'imageBase64': {'stringValue': post.imageBase64},
+        }
+      }),
+    );
+    if (response.statusCode == 200) {
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> postComment(String postId, String comment) async {
+    final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post/$postId/comment');
+    final response = await http.post(
+      url,
+      headers: await _getHeaders(),
+      body: jsonEncode({
+        'fields': {
+          'text': {
+            'stringValue': comment,
+          },
+          'author': {
+            'stringValue': _account!.email,
+          },
+        },
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> modifyPost(Post post) async {
+    final url =
+        Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post/${post.id}');
+    final headers = await _getHeaders();
+    final likesList = post.likedBy?.map((e) => {'stringValue': e}).toList();
+    final response = await http.patch(
+      url,
+      body: jsonEncode({
+        'fields': {
+          'author': {'stringValue': post.author},
+          'header': {'stringValue': post.header},
+          'imageBase64': {'stringValue': post.imageBase64},
+          if (likesList?.isNotEmpty == true)
+          'likedBy': {
+            'arrayValue': {
+              'values': likesList
+            }
+          }
+        }
+      }),
+      headers: headers,
+    );
+
+    return response.statusCode == 200;
+  }
+
   Future<void> saveAccessToken(AuthToken token) => _sharedPreferences.setString(tokenPreferenceKey, jsonEncode(token));
 
   Future<AuthToken?> getAccessToken() async {
@@ -100,8 +166,7 @@ class FakestagramRepository {
   }
 
   Future<bool> createAccount(String email, String password) async {
-    final url =
-        Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCXo4VVDGqt0GmuklBvuYHPD3y72LVG4cg');
+    final url = Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCXo4VVDGqt0GmuklBvuYHPD3y72LVG4cg');
     final response = await http.post(
       url,
       body: {
@@ -126,17 +191,6 @@ class FakestagramRepository {
     return false;
   }
 
-  Future<bool> addPost(Map<String, dynamic> params) async {
-    final url = Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
-    final response = await http.post(
-      url,
-      body: params,
-      headers: await _getHeaders(),
-    );
-
-    return response.statusCode == 200;
-  }
-
   Future<Map<String, String>> _getHeaders() async {
     Map<String, String> headers = {};
 
@@ -156,12 +210,20 @@ class FakestagramRepository {
   Post _getPost(Map data) {
     final idField = data['name'] as String;
     final id = idField.split('/').last;
+    List<String> likedByList;
+    try {
+      likedByList =
+          (data['fields']['likedBy']['arrayValue']['values'] as List<dynamic>).map((e) => e['stringValue'] as String).toList();
+    } catch (e) {
+      likedByList = [];
+    }
     Post post = Post(
       id: id,
-      image: data['fields']['imageBase64']['stringValue'],
+      author: data['fields']['author']['stringValue'],
+      imageBase64: data['fields']['imageBase64']['stringValue'],
       header: data['fields']['header']['stringValue'],
       avatar: 'https://picsum.photos/600?image=${Random().nextInt(80)}',
-      likedBy: data['fields']['likedBy']['arrayValue']['values'].map((item) => item['stringValue']).toList(),
+      likedBy: likedByList,
     );
 
     return post;

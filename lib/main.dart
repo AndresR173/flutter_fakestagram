@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/repository.dart';
 import 'presentation/change_notifiers/account_change_notifier.dart';
+import 'presentation/change_notifiers/comments_change_notifier.dart';
 import 'presentation/change_notifiers/create_account_change_notifier.dart';
 import 'presentation/change_notifiers/login_change_notifier.dart';
 import 'presentation/change_notifiers/posts_change_notifier.dart';
@@ -41,6 +42,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<CreateAccountChangeNotifier>(
           create: (_) => CreateAccountChangeNotifier(repository),
+        ),
+        ChangeNotifierProvider<CommentsChangeNotifier>(
+          create: (_) => CommentsChangeNotifier(repository),
         )
       ],
       child: MaterialApp(

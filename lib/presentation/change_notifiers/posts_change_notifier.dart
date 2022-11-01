@@ -51,9 +51,6 @@ class PostsChangeNotifier extends ChangeNotifier {
   }
 
 
-  Future<void> commentPost(Post post, String comment) async {
-
-  }
 
 
 

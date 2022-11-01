@@ -23,17 +23,17 @@ class _FeedPageState extends State<FeedPage> {
   @override
   void initState() {
     super.initState();
-    final provider = context.read<PostsChangeNotifier>();
-    provider.addListener(() {
-      if (provider.fetchPostsState == FutureState.failure) {
-        if (provider.error is UnauthorizedException) {
+    final changeNotifier = context.read<PostsChangeNotifier>();
+    changeNotifier.addListener(() {
+      if (changeNotifier.fetchPostsState == FutureState.failure) {
+        if (changeNotifier.error is UnauthorizedException) {
           if (!mounted) return;
           showGenericDialog(
             context,
             'the session token has expired',
             title: 'Error',
             onOkPressed: () async {
-              await provider.deleteSession();
+              await changeNotifier.deleteSession();
               unawaited(Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => const LoginPage()),
@@ -43,11 +43,11 @@ class _FeedPageState extends State<FeedPage> {
           );
         } else {
           if (!mounted) return;
-          showGenericDialog(context, 'error: ${provider.error}', title: 'Error');
+          showGenericDialog(context, 'error: ${changeNotifier.error}', title: 'Error');
         }
       }
     });
-    fetchPosts(provider);
+    fetchPosts(changeNotifier);
   }
 
   @override
@@ -67,16 +67,12 @@ class _FeedPageState extends State<FeedPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => CommentsPage(
-                          comments: post.comments!,
-                          onNewComment: (String comment) {
-                            changeNotifier.commentPost(post, comment);
-                          },
-                        ),
+                        builder: (_) => CommentsPage(post: post),
                       ),
                     );
                   },
-                  onLike: () {}, accountEmail: changeNotifier.userAccount?.email,
+                  onLike: () {},
+                  accountEmail: changeNotifier.userAccount?.email,
                 );
               },
               itemCount: posts.length,
