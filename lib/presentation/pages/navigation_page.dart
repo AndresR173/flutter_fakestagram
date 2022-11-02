@@ -1,4 +1,3 @@
-import 'package:fakestagram/presentation/pages/search_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/assets.dart';
@@ -6,6 +5,7 @@ import '../widgets/fakestagram_app_bar.dart';
 import 'account_page.dart';
 import 'feed_page.dart';
 import 'new_post_page.dart';
+import 'search_page.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
