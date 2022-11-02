@@ -161,7 +161,8 @@ class _NewPostPageState extends State<NewPostPage> {
                 MaterialButton(
                   onPressed: () async {
                     if (Platform.isIOS) {
-                      await askForCameraPermission();
+                      final permissionWasGranted = await askForCameraPermission();
+                      if (!permissionWasGranted) return;
                     }
                     await changeNotifier.captureImageAndProcess(
                       imageSource: ImageSource.camera,
@@ -198,7 +199,8 @@ class _NewPostPageState extends State<NewPostPage> {
                 MaterialButton(
                   onPressed: () async {
                     if (Platform.isIOS) {
-                      await askForImageGalleryPermission();
+                      final permissionWasGranted = await askForImageGalleryPermission();
+                      if (!permissionWasGranted) return;
                     }
                     await changeNotifier.captureImageAndProcess(
                       imageSource: ImageSource.gallery,
