@@ -8,7 +8,6 @@ import 'random_image.dart';
 import 'user_image.dart';
 
 class PostCard extends StatelessWidget {
-  final String? accountEmail;
   final Post post;
   final VoidCallback onComment;
   final VoidCallback onLike;
@@ -18,7 +17,6 @@ class PostCard extends StatelessWidget {
     required this.post,
     required this.onComment,
     required this.onLike,
-    required this.accountEmail,
   });
 
   @override
@@ -32,6 +30,7 @@ class PostCard extends StatelessWidget {
           buildHeader(),
           buildImage(),
           buildActions(),
+          if (post.getLikesCount() > 0)
           buildLikes(),
           if (post.comments?.isNotEmpty == true) buildComments(),
         ],
@@ -86,7 +85,7 @@ class PostCard extends StatelessWidget {
             children: [
               IconButton(
                 icon: Icon(
-                  post.getIsLiked(accountEmail) ? Icons.favorite : Icons.favorite_border,
+                  post.isLiked ? Icons.favorite : Icons.favorite_border,
                   color: Colors.white,
                   size: 24,
                 ),
@@ -124,9 +123,12 @@ class PostCard extends StatelessWidget {
   }
 
   Widget buildLikes() {
-    return const Padding(
-      padding: EdgeInsets.only(left: 20, top: 5),
-      child: Likes(),
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 5),
+      child: Text(
+        "${post.getLikesCount()} likes",
+        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+      ),
     );
   }
 

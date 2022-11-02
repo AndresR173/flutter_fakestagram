@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../data/repository.dart';
 import '../../models/post.dart';
-import '../../models/user_account.dart';
 import 'future_state.dart';
 
 class PostsChangeNotifier extends ChangeNotifier {
@@ -17,11 +16,6 @@ class PostsChangeNotifier extends ChangeNotifier {
   FutureState _getPostsState = FutureState.none;
 
   FutureState get fetchPostsState => _getPostsState;
-
-  UserAccount? _userAccount;
-
-  UserAccount? get userAccount => _userAccount;
-
   dynamic _error;
 
   dynamic get error => _error;
@@ -30,11 +24,11 @@ class PostsChangeNotifier extends ChangeNotifier {
     _posts = [];
     _getPostsState = FutureState.wait;
     _error = null;
-    _userAccount = _repository.getAccountEmail();
   }
 
   Future<void> getPosts() async {
     _getPostsState = FutureState.wait;
+    notifyListeners();
     try {
       _posts = await _repository.getPosts();
       _getPostsState = FutureState.success;
@@ -46,12 +40,16 @@ class PostsChangeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> likePost(Post post) async {
-
+  Future<void> likePost(Post post) => _repository.likePost(post);
+  Future<void> getPostsNoWait() async {
+    try {
+      _posts = await _repository.getPosts();
+    } catch (e) {
+      _getPostsState = FutureState.failure;
+      _error = e;
+    }
+    notifyListeners();
   }
-
-
-
 
 
   Future<void> deleteSession() => _repository.deleteAccessToken();

@@ -114,6 +114,7 @@ class _CommentsPageState extends State<CommentsPage> {
                           onPressed: () async {
                             final changeNotifier = context.read<CommentsChangeNotifier>();
                             await changeNotifier.postComment(widget.post.id, _commentController.text);
+                            _commentController.clear();
                             await changeNotifier.getComments(widget.post.id);
                           },
                           icon: const Icon(Icons.send, color: Colors.white)),

@@ -99,6 +99,16 @@ class FakestagramRepository {
     return response.statusCode == 200;
   }
 
+  Future<void> likePost(Post post) async {
+    if (_account?.email?.isEmpty == true) return;
+    if (post.likedBy?.contains(_account?.email) == true) {
+      post.likedBy?.remove(_account?.email);
+    } else {
+      post.likedBy?.add(_account?.email ?? '');
+    }
+    await modifyPost(post);
+  }
+
   Future<bool> modifyPost(Post post) async {
     final url =
         Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post/${post.id}');
@@ -112,11 +122,9 @@ class FakestagramRepository {
           'header': {'stringValue': post.header},
           'imageBase64': {'stringValue': post.imageBase64},
           if (likesList?.isNotEmpty == true)
-          'likedBy': {
-            'arrayValue': {
-              'values': likesList
+            'likedBy': {
+              'arrayValue': {'values': likesList}
             }
-          }
         }
       }),
       headers: headers,
@@ -217,12 +225,14 @@ class FakestagramRepository {
     } catch (e) {
       likedByList = [];
     }
+    final isLiked = likedByList.contains(_account!.email);
     Post post = Post(
       id: id,
       author: data['fields']['author']['stringValue'],
       imageBase64: data['fields']['imageBase64']['stringValue'],
       header: data['fields']['header']['stringValue'],
       avatar: 'https://picsum.photos/600?image=${Random().nextInt(80)}',
+      isLiked: isLiked,
       likedBy: likedByList,
     );
 

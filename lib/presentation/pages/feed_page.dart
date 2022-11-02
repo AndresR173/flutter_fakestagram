@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/unauthorized_exception.dart';
@@ -47,7 +48,10 @@ class _FeedPageState extends State<FeedPage> {
         }
       }
     });
-    fetchPosts(changeNotifier);
+    changeNotifier.init();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      changeNotifier.getPosts();
+    });
   }
 
   @override
@@ -63,16 +67,21 @@ class _FeedPageState extends State<FeedPage> {
                 final post = posts[index];
                 return PostCard(
                   post: post,
-                  onComment: () {
-                    Navigator.push(
+                  onComment: () async {
+                    final commentWasAdded = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => CommentsPage(post: post),
                       ),
                     );
+                    if (commentWasAdded) {
+                      await changeNotifier.getPosts();
+                    }
                   },
-                  onLike: () {},
-                  accountEmail: changeNotifier.userAccount?.email,
+                  onLike: () async {
+                    await changeNotifier.likePost(post);
+                    await changeNotifier.getPosts();
+                  },
                 );
               },
               itemCount: posts.length,
@@ -85,10 +94,5 @@ class _FeedPageState extends State<FeedPage> {
         },
       ),
     );
-  }
-
-  void fetchPosts(PostsChangeNotifier provider) {
-    provider.init();
-    provider.getPosts();
   }
 }

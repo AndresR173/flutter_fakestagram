@@ -51,11 +51,10 @@ class LoginChangeNotifier extends ChangeNotifier {
       await _repository.saveAccessToken(token);
       await _repository.saveUserAccount(UserAccount(email: _email!));
       _loginActionState = FutureState.success;
-      notifyListeners();
     } catch (err) {
       _loginActionState = FutureState.failure;
       _error = err;
-      notifyListeners();
     }
+    notifyListeners();
   }
 }
