@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -40,76 +39,83 @@ class _NewPostPageState extends State<NewPostPage> {
   @override
   Widget build(BuildContext oldContext) {
     return ChangeNotifierProvider(
-        create: (_) => _changeNotifier,
-        builder: (context, _) {
-          return Scaffold(
+      create: (_) => _changeNotifier,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: AppColors.primaryColor,
+          appBar: AppBar(
             backgroundColor: AppColors.primaryColor,
-            appBar: AppBar(
-              backgroundColor: AppColors.primaryColor,
-              centerTitle: false,
-              title: const Text('New Post'),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.check, color: Colors.cyan),
-                  onPressed: () {
-                    _changeNotifier.setPostText(_postTextController.text);
-                    _changeNotifier.makePost(
-                      onPostSuccess: () => Navigator.of(context).pop(),
-                      onPostFailure: (error) => showGenericDialog(
-                        context,
-                        'error: ${error.toString()}',
-                        title: 'Error',
+            centerTitle: false,
+            title: const Text('New Post'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.check, color: Colors.cyan),
+                onPressed: () {
+                  _changeNotifier.setPostText(_postTextController.text);
+                  _changeNotifier.makePost(
+                    onPostSuccess: () => Navigator.of(context).pop(),
+                    onPostFailure: (error) => showGenericDialog(
+                      context,
+                      'error: ${error.toString()}',
+                      title: 'Error',
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Consumer<NewPostChangeNotifier>(
+                    builder: (_, changeNotifier, __) {
+                  if (changeNotifier.pickedImageState == FutureState.wait) {
+                    return const CircularProgressIndicator();
+                  } else {
+                    return GestureDetector(
+                      onTap: () => pickPhoto(
+                          context: context,
+                          onImagePicked: (base64) {
+                            changeNotifier.setBase64(base64);
+                          }),
+                      child: ColoredBox(
+                        color: Colors.white,
+                        child: changeNotifier.imageBase64 != null
+                            ? Image.memory(
+                                base64Decode(changeNotifier.imageBase64!),
+                                height: 80)
+                            : Image.asset(Assets.picturePlaceholder,
+                                height: 80),
                       ),
                     );
-                  },
+                  }
+                }),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    style: const TextStyle(color: Colors.white),
+                    controller: _postTextController,
+                    decoration: const InputDecoration(
+                      hintText: 'Write a caption...',
+                      hintStyle: TextStyle(color: Colors.white),
+                      border: InputBorder.none,
+                    ),
+                  ),
                 ),
               ],
             ),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Consumer<NewPostChangeNotifier>(builder: (_, changeNotifier, __) {
-                    if (changeNotifier.pickedImageState == FutureState.wait) {
-                      return const CircularProgressIndicator();
-                    } else {
-                      return GestureDetector(
-                        onTap: () => pickPhoto(
-                            context: context,
-                            onImagePicked: (base64) {
-                              changeNotifier.setBase64(base64);
-                              print(base64);
-                            }),
-                        child: ColoredBox(
-                          color: Colors.white,
-                          child: changeNotifier.imageBase64 != null
-                              ? Image.memory(base64Decode(changeNotifier.imageBase64!), height: 80)
-                              : Image.asset(Assets.picturePlaceholder, height: 80),
-                        ),
-                      );
-                    }
-                  }),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      style: const TextStyle(color: Colors.white),
-                      controller: _postTextController,
-                      decoration: const InputDecoration(
-                        hintText: 'Write a caption...',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
-  Future<void> pickPhoto({required BuildContext context, required void Function(String base64) onImagePicked}) async {
+  Future<void> pickPhoto({
+    required BuildContext context,
+    required void Function(String base64) onImagePicked,
+  }) async {
     await showGenericBottomSheet(
       context: context,
       builder: (_) => Padding(
@@ -120,7 +126,10 @@ class _NewPostPageState extends State<NewPostPage> {
             Container(
               height: 3,
               width: 60,
-              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(100))),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(100)),
+              ),
             ),
             const SizedBox(height: 20),
             Row(
@@ -152,7 +161,10 @@ class _NewPostPageState extends State<NewPostPage> {
                 const SizedBox(width: 20),
                 MaterialButton(
                   onPressed: () async {
-                    await processAndDispatchImage(context: context, imageSource: ImageSource.gallery, onImagePicked: onImagePicked);
+                    await processAndDispatchImage(
+                        context: context,
+                        imageSource: ImageSource.gallery,
+                        onImagePicked: onImagePicked);
                   },
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -183,8 +195,7 @@ class _NewPostPageState extends State<NewPostPage> {
     required void Function(String base64) onImagePicked,
   }) async {
     try {
-      final changeNotifier = context.read<NewPostChangeNotifier>();
-      changeNotifier.setPickedImageState(FutureState.wait);
+      _changeNotifier.setPickedImageState(FutureState.wait);
       final imagePicker = ImagePicker();
       final pickedFilePath = await imagePicker
           .pickImage(
@@ -192,24 +203,14 @@ class _NewPostPageState extends State<NewPostPage> {
           )
           .then((xfile) => xfile?.path);
       if (pickedFilePath == null) return;
-      final base64 = await compressAndEncodeImageAsBase64(pickedFilePath);
+      final base64 =
+          await _changeNotifier.compressAndEncodeImageAsBase64(pickedFilePath);
       Navigator.pop(context);
       if (base64 == null) return;
-      changeNotifier.setPickedImageState(FutureState.success);
+      _changeNotifier.setPickedImageState(FutureState.success);
       onImagePicked(base64);
     } catch (ex) {
       await showGenericDialog(context, ex.toString(), title: 'error');
     }
-  }
-
-  Future<String?> compressAndEncodeImageAsBase64(String filePath) async {
-    var result = await FlutterImageCompress.compressWithFile(
-      filePath,
-      minWidth: 1300,
-      minHeight: 1300,
-      quality: 70,
-    );
-
-    return result != null ? base64Encode(result) : null;
   }
 }

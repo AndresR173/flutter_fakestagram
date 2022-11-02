@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 
 import '../../models/post.dart';
-import 'random_image.dart';
 import 'user_image.dart';
 
 class PostCard extends StatelessWidget {
@@ -59,7 +57,7 @@ class PostCard extends StatelessWidget {
                 ),
               ),
               Text(
-                post.author ?? '',
+                post.author,
                 style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
