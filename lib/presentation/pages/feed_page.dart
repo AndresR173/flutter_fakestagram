@@ -61,8 +61,8 @@ class _FeedPageState extends State<FeedPage> with AutomaticKeepAliveClientMixin 
   }
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context);
+  Widget build(BuildContext oldContext) {
+    super.build(oldContext);
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
       body: Consumer<PostsChangeNotifier>(

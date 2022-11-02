@@ -1,3 +1,4 @@
+import 'package:fakestagram/presentation/pages/search_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/assets.dart';
@@ -46,12 +47,10 @@ class _NavigationPageState extends State<NavigationPage> with TickerProviderStat
         ),
         body: TabBarView(
           controller: _tabController,
-          children: [
-            const FeedPage(),
-            Container(
-              color: Colors.blue,
-            ),
-            const AccountPage()
+          children: const [
+            FeedPage(),
+            SearchPage(),
+            AccountPage()
           ],
         ),
         bottomNavigationBar: TabBar(
