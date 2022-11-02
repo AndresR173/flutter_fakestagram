@@ -18,6 +18,7 @@ class NewPostChangeNotifier extends ChangeNotifier {
 
   void setPickedImagePath(String? value) {
     _pickedImagePath = value;
+    notifyListeners();
   }
 
   void setPickedImageState(FutureState value) {

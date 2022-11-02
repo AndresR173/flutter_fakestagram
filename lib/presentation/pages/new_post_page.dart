@@ -66,11 +66,14 @@ class _NewPostPageState extends State<NewPostPage> {
                       return const CircularProgressIndicator();
                     } else {
                       return GestureDetector(
-                        onTap: () => pickPhoto(context: context, onImagePicked: (thumbPath, base64) {}),
+                        onTap: () => pickPhoto(context: context, onImagePicked: (thumbPath, base64) {
+                          changeNotifier.setPickedImagePath(thumbPath);
+                          print(base64);
+                        }),
                         child: ColoredBox(
                           color: Colors.white,
                           child: changeNotifier.pickedImagePath != null
-                              ? Image.file(File(changeNotifier.pickedImagePath!))
+                              ? Image.file(File(changeNotifier.pickedImagePath!), height: 80, fit: BoxFit.fitHeight)
                               : Image.asset(Assets.picturePlaceholder, height: 80),
                         ),
                       );
