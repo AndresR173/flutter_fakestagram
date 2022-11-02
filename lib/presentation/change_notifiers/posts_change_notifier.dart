@@ -28,7 +28,7 @@ class PostsChangeNotifier extends ChangeNotifier {
 
   void init() {
     _posts = [];
-    _getPostsState = FutureState.none;
+    _getPostsState = FutureState.wait;
     _error = null;
     _userAccount = _repository.getAccountEmail();
   }
@@ -38,12 +38,12 @@ class PostsChangeNotifier extends ChangeNotifier {
     try {
       _posts = await _repository.getPosts();
       _getPostsState = FutureState.success;
-      notifyListeners();
+
     } catch (e) {
       _getPostsState = FutureState.failure;
       _error = e;
-      notifyListeners();
     }
+    notifyListeners();
   }
 
   Future<void> likePost(Post post) async {

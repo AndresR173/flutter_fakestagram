@@ -8,8 +8,6 @@ class CommentsChangeNotifier extends ChangeNotifier {
 
   final FakestagramRepository _repository;
 
-  CommentsChangeNotifier(this._repository);
-
   List<Comment> _comments = [];
 
   List<Comment> get comments => _comments;
@@ -24,14 +22,17 @@ class CommentsChangeNotifier extends ChangeNotifier {
 
   bool commentWasAdded = false;
 
-
   dynamic _error;
 
   dynamic get error => _error;
 
+  CommentsChangeNotifier(this._repository);
+
   void init() {
     _comments = [];
-    _getCommentsState = FutureState.none;
+    _getCommentsState = FutureState.wait;
+    _postCommentState = FutureState.none;
+    commentWasAdded = false;
     _error = null;
   }
 
@@ -41,29 +42,25 @@ class CommentsChangeNotifier extends ChangeNotifier {
     try {
       _comments = await _repository.getCommentsByPost(postId).then((commentList) => commentList ?? []);
       _getCommentsState = FutureState.success;
-      notifyListeners();
+
     } catch (e) {
       _error = e;
       _getCommentsState = FutureState.failure;
-      notifyListeners();
     }
-
+    notifyListeners();
   }
 
   Future<void> postComment(String postId, String text) async {
     _postCommentState = FutureState.wait;
+    notifyListeners();
     try {
       await _repository.postComment(postId, text);
       commentWasAdded = true;
       _postCommentState = FutureState.success;
-      notifyListeners();
     } catch (e) {
       _error = e;
       _postCommentState = FutureState.failure;
-      notifyListeners();
     }
-    commentWasAdded = true;
+    notifyListeners();
   }
-
-
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/comment.dart';
@@ -37,22 +38,17 @@ class _CommentsPageState extends State<CommentsPage> {
     super.initState();
     final changeNotifier = context.read<CommentsChangeNotifier>();
     changeNotifier.addListener(() {
-      if (changeNotifier.postCommentsState == FutureState.success) {
-        _commentController.clear();
-        changeNotifier.getComments(widget.post.id);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('comment added'),
-          ),
-        );
-      } else if (changeNotifier.getCommentsState == FutureState.failure ||
+     if (changeNotifier.getCommentsState == FutureState.failure ||
           changeNotifier.postCommentsState == FutureState.failure) {
         if (!mounted) return;
         showGenericDialog(context, 'error: ${changeNotifier.error}', title: 'Error');
       }
     });
     changeNotifier.init();
-    changeNotifier.getComments(widget.post.id);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      changeNotifier.getComments(widget.post.id);
+    });
+
   }
 
   @override
@@ -78,7 +74,7 @@ class _CommentsPageState extends State<CommentsPage> {
                 ),
                 Expanded(
                   child: Consumer<CommentsChangeNotifier>(builder: (_, changeNotifier, __) {
-                    if (changeNotifier.getCommentsState == FutureState.wait) {
+                    if (changeNotifier.getCommentsState == FutureState.success) {
                       return ListView.separated(
                         separatorBuilder: (_, __) => const SizedBox(
                           height: 5,
@@ -115,9 +111,10 @@ class _CommentsPageState extends State<CommentsPage> {
                       ),
                       const SizedBox(width: 10),
                       IconButton(
-                          onPressed: () {
+                          onPressed: () async {
                             final changeNotifier = context.read<CommentsChangeNotifier>();
-                            changeNotifier.postComment(widget.post.id, _commentController.text);
+                            await changeNotifier.postComment(widget.post.id, _commentController.text);
+                            await changeNotifier.getComments(widget.post.id);
                           },
                           icon: const Icon(Icons.send, color: Colors.white)),
                     ],
