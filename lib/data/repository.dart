@@ -44,6 +44,12 @@ class FakestagramRepository {
     return posts;
   }
 
+  Future<List<String>> getAllPhotos() async {
+    final posts = await getPosts();
+    final photos = posts.map((post) => post.imageBase64).toList();
+    return photos;
+  }
+
   Future<List<Comment>?> getCommentsByPost(String postId) async {
     final url = Uri.parse(
         'https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post/$postId/comment');

@@ -56,10 +56,10 @@ class _CommentsPageState extends State<CommentsPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext oldContext) {
     return ChangeNotifierProvider(
       create: (_) => _changeNotifier,
-      builder: (context, child) {
+      builder: (context, _) {
         return Scaffold(
           backgroundColor: AppColors.primaryColor,
           appBar: FakestagramAppBar(

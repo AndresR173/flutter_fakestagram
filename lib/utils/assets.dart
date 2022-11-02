@@ -11,6 +11,7 @@ class Assets {
   static const String personOutline = "assets/images/ic_person_outline.png";
   static const String titleImage = "assets/images/instagram_title.png";
   static const String logo = "assets/images/ic_app_logo.png";
+  static const String picturePlaceholder = "assets/images/ic_picture_placeholder.png";
 }
 
 class AppColors {

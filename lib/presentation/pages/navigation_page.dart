@@ -4,6 +4,7 @@ import '../../utils/assets.dart';
 import '../widgets/fakestagram_app_bar.dart';
 import 'account_page.dart';
 import 'feed_page.dart';
+import 'new_post_page.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -12,8 +13,7 @@ class NavigationPage extends StatefulWidget {
   State<NavigationPage> createState() => _NavigationPageState();
 }
 
-class _NavigationPageState extends State<NavigationPage>
-    with TickerProviderStateMixin {
+class _NavigationPageState extends State<NavigationPage> with TickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -41,7 +41,9 @@ class _NavigationPageState extends State<NavigationPage>
       length: 3,
       child: Scaffold(
         backgroundColor: const Color(0xFF212121),
-        appBar: FakestagramAppBar(),
+        appBar: FakestagramAppBar(
+          onNewPostPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NewPostPage())),
+        ),
         body: TabBarView(
           controller: _tabController,
           children: [

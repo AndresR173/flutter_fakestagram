@@ -20,8 +20,7 @@ class FeedPage extends StatefulWidget {
   State<FeedPage> createState() => _FeedPageState();
 }
 
-class _FeedPageState extends State<FeedPage>
-    with AutomaticKeepAliveClientMixin {
+class _FeedPageState extends State<FeedPage> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -70,29 +69,34 @@ class _FeedPageState extends State<FeedPage>
         builder: (_, changeNotifier, __) {
           final posts = changeNotifier.posts;
           if (changeNotifier.fetchPostsState == FutureState.success) {
-            return ListView.builder(
-              itemBuilder: (_, index) {
-                final post = posts[index];
-                return PostCard(
-                  post: post,
-                  onComment: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CommentsPage(
-                          post: post,
-                          onPostAdded: () => changeNotifier.getPosts(),
-                        ),
-                      ),
-                    );
-                  },
-                  onLike: () async {
-                    await changeNotifier.likePost(post);
-                    await changeNotifier.getPosts();
-                  },
-                );
+            return RefreshIndicator(
+              onRefresh: () async {
+                await changeNotifier.getPosts();
               },
-              itemCount: posts.length,
+              child: ListView.builder(
+                itemBuilder: (_, index) {
+                  final post = posts[index];
+                  return PostCard(
+                    post: post,
+                    onComment: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CommentsPage(
+                            post: post,
+                            onPostAdded: () => changeNotifier.getPosts(),
+                          ),
+                        ),
+                      );
+                    },
+                    onLike: () async {
+                      await changeNotifier.likePost(post);
+                      await changeNotifier.getPosts();
+                    },
+                  );
+                },
+                itemCount: posts.length,
+              ),
             );
           } else {
             return const Center(
