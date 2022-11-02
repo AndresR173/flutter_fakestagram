@@ -66,14 +66,15 @@ class _NewPostPageState extends State<NewPostPage> {
                       return const CircularProgressIndicator();
                     } else {
                       return GestureDetector(
-                        onTap: () => pickPhoto(context: context, onImagePicked: (thumbPath, base64) {
-                          changeNotifier.setPickedImagePath(thumbPath);
-                          print(base64);
-                        }),
+                        onTap: () => pickPhoto(
+                            context: context,
+                            onImagePicked: (base64) {
+                              changeNotifier.setBase64(base64);
+                            }),
                         child: ColoredBox(
                           color: Colors.white,
-                          child: changeNotifier.pickedImagePath != null
-                              ? Image.file(File(changeNotifier.pickedImagePath!), height: 80, fit: BoxFit.fitHeight)
+                          child: changeNotifier.imageBase64 != null
+                              ? Image.memory(base64Decode(changeNotifier.imageBase64!), height: 80)
                               : Image.asset(Assets.picturePlaceholder, height: 80),
                         ),
                       );
@@ -98,8 +99,7 @@ class _NewPostPageState extends State<NewPostPage> {
         });
   }
 
-  Future<void> pickPhoto(
-      {required BuildContext context, required void Function(String thumbPath, String base64) onImagePicked}) async {
+  Future<void> pickPhoto({required BuildContext context, required void Function(String base64) onImagePicked}) async {
     await showGenericBottomSheet(
       context: context,
       builder: (_) => Padding(
@@ -170,7 +170,7 @@ class _NewPostPageState extends State<NewPostPage> {
   Future<void> processAndDispatchImage({
     required BuildContext context,
     required ImageSource imageSource,
-    required void Function(String thumbPath, String base64) onImagePicked,
+    required void Function(String base64) onImagePicked,
   }) async {
     try {
       final changeNotifier = context.read<NewPostChangeNotifier>();
@@ -186,7 +186,7 @@ class _NewPostPageState extends State<NewPostPage> {
       Navigator.pop(context);
       if (base64 == null) return;
       changeNotifier.setPickedImageState(FutureState.success);
-      onImagePicked(pickedFilePath, base64);
+      onImagePicked(base64);
     } catch (ex) {
       await showGenericDialog(context, ex.toString(), title: 'error');
     }
@@ -195,8 +195,8 @@ class _NewPostPageState extends State<NewPostPage> {
   Future<String?> compressAndEncodeImageAsBase64(String filePath) async {
     var result = await FlutterImageCompress.compressWithFile(
       filePath,
-      minWidth: 1280,
-      minHeight: 720,
+      minWidth: 1300,
+      minHeight: 1300,
       quality: 70,
     );
 

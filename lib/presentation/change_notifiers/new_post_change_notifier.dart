@@ -11,18 +11,23 @@ class NewPostChangeNotifier extends ChangeNotifier {
   String? _pickedImagePath;
 
   String? get pickedImagePath => _pickedImagePath;
+  
+  String? _imageBase64;
+  
+  String? get imageBase64 => _imageBase64;
 
   FutureState _pickedImageState = FutureState.none;
 
   FutureState get pickedImageState => _pickedImageState;
-
-  void setPickedImagePath(String? value) {
-    _pickedImagePath = value;
-    notifyListeners();
-  }
+  
 
   void setPickedImageState(FutureState value) {
     _pickedImageState = value;
+    notifyListeners();
+  }
+
+  void setBase64(String? value) {
+    _imageBase64 = value;
     notifyListeners();
   }
 }
