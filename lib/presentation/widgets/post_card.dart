@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -39,9 +40,7 @@ class PostCard extends StatelessWidget {
   Widget buildImage() {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: RandomImage(
-        media: 'https://picsum.photos/id/${Random().nextInt(80)}/200',
-      ),
+      child: Image.memory(base64Decode(post.imageBase64)),
     );
   }
 
@@ -54,14 +53,14 @@ class PostCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 8, left: 20),
                 child: UserImage(
-                  image: post.avatar,
+                  image: post.avatar ?? '',
                   radio: 16,
                   width: 38,
                 ),
               ),
-              const Text(
-                'User name',
-                style: TextStyle(
+              Text(
+                post.author ?? '',
+                style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16),
@@ -88,7 +87,7 @@ class PostCard extends StatelessWidget {
             children: [
               IconButton(
                 icon: Icon(
-                  post.isLiked ? Icons.favorite : Icons.favorite_border,
+                  post.isLiked == true ? Icons.favorite : Icons.favorite_border,
                   color: Colors.white,
                   size: 24,
                 ),

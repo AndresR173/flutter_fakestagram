@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -21,7 +20,7 @@ class NewPostPage extends StatefulWidget {
 }
 
 class _NewPostPageState extends State<NewPostPage> {
-  final _textEditingController = TextEditingController();
+  final _postTextController = TextEditingController();
   late NewPostChangeNotifier _changeNotifier;
 
   @override
@@ -34,7 +33,7 @@ class _NewPostPageState extends State<NewPostPage> {
 
   @override
   void dispose() {
-    _textEditingController.dispose();
+    _postTextController.dispose();
     super.dispose();
   }
 
@@ -52,7 +51,17 @@ class _NewPostPageState extends State<NewPostPage> {
               actions: [
                 IconButton(
                   icon: const Icon(Icons.check, color: Colors.cyan),
-                  onPressed: () {},
+                  onPressed: () {
+                    _changeNotifier.setPostText(_postTextController.text);
+                    _changeNotifier.makePost(
+                      onPostSuccess: () => Navigator.of(context).pop(),
+                      onPostFailure: (error) => showGenericDialog(
+                        context,
+                        'error: ${error.toString()}',
+                        title: 'Error',
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -70,6 +79,7 @@ class _NewPostPageState extends State<NewPostPage> {
                             context: context,
                             onImagePicked: (base64) {
                               changeNotifier.setBase64(base64);
+                              print(base64);
                             }),
                         child: ColoredBox(
                           color: Colors.white,
@@ -84,7 +94,7 @@ class _NewPostPageState extends State<NewPostPage> {
                   Expanded(
                     child: TextField(
                       style: const TextStyle(color: Colors.white),
-                      controller: _textEditingController,
+                      controller: _postTextController,
                       decoration: const InputDecoration(
                         hintText: 'Write a caption...',
                         hintStyle: TextStyle(color: Colors.white),

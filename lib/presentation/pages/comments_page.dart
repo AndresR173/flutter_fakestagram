@@ -38,10 +38,9 @@ class _CommentsPageState extends State<CommentsPage> {
     _changeNotifier = CommentsChangeNotifier(
       context.read<FakestagramRepository>(),
     );
-    _changeNotifier.postId = widget.post.id;
+    _changeNotifier.postId = widget.post.id ?? '';
     _changeNotifier.addListener(() {
-      if (_changeNotifier.getCommentsState == FutureState.failure ||
-          _changeNotifier.postCommentsState == FutureState.failure) {
+      if (_changeNotifier.getCommentsState == FutureState.failure || _changeNotifier.postCommentsState == FutureState.failure) {
         if (!mounted) return;
         showGenericDialog(
           context,
@@ -74,10 +73,8 @@ class _CommentsPageState extends State<CommentsPage> {
                   height: 10,
                 ),
                 Expanded(
-                  child: Consumer<CommentsChangeNotifier>(
-                      builder: (_, changeNotifier, __) {
-                    if (changeNotifier.getCommentsState ==
-                        FutureState.success) {
+                  child: Consumer<CommentsChangeNotifier>(builder: (_, changeNotifier, __) {
+                    if (changeNotifier.getCommentsState == FutureState.success) {
                       return ListView.separated(
                         separatorBuilder: (_, __) => const SizedBox(
                           height: 5,
@@ -117,10 +114,9 @@ class _CommentsPageState extends State<CommentsPage> {
                       const SizedBox(width: 10),
                       IconButton(
                         onPressed: () async {
-                          final changeNotifier =
-                              context.read<CommentsChangeNotifier>();
-                          await changeNotifier.postComment(
-                              widget.post.id, _commentController.text);
+                          if (widget.post.id == null) return;
+                          final changeNotifier = context.read<CommentsChangeNotifier>();
+                          await changeNotifier.postComment(widget.post.id!, _commentController.text);
                           _commentController.clear();
                           widget.onPostAdded?.call();
                         },
