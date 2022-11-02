@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/repository.dart';
@@ -112,6 +114,26 @@ class _NewPostPageState extends State<NewPostPage> {
     );
   }
 
+  Future<bool> askForCameraPermission() async {
+    final permissionStatus = await Permission.camera.status;
+    if (permissionStatus.isGranted) {
+      return true;
+    } else {
+      final result = await Permission.camera.request();
+      return result == PermissionStatus.granted;
+    }
+  }
+
+  Future<bool> askForImageGalleryPermission() async {
+    final permissionStatus = await Permission.photos.status;
+    if (permissionStatus.isGranted) {
+      return true;
+    } else {
+      final result = await Permission.photos.request();
+      return result == PermissionStatus.granted;
+    }
+  }
+
   Future<void> pickPhoto({
     required BuildContext context,
     required void Function(String? base64) onImagePicked,
@@ -137,8 +159,11 @@ class _NewPostPageState extends State<NewPostPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 MaterialButton(
-                  onPressed: () {
-                    changeNotifier.captureImageAndProcess(
+                  onPressed: () async {
+                    if (Platform.isIOS) {
+                      await askForCameraPermission();
+                    }
+                    await changeNotifier.captureImageAndProcess(
                       imageSource: ImageSource.camera,
                       onSuccess: (imageBase64) {
                         Navigator.pop(context);
@@ -171,8 +196,11 @@ class _NewPostPageState extends State<NewPostPage> {
                 ),
                 const SizedBox(width: 20),
                 MaterialButton(
-                  onPressed: () {
-                    changeNotifier.captureImageAndProcess(
+                  onPressed: () async {
+                    if (Platform.isIOS) {
+                      await askForImageGalleryPermission();
+                    }
+                    await changeNotifier.captureImageAndProcess(
                       imageSource: ImageSource.gallery,
                       onSuccess: (imageBase64) {
                         Navigator.pop(context);
