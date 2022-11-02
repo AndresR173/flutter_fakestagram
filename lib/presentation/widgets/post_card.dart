@@ -97,7 +97,7 @@ class PostCard extends StatelessWidget {
                   color: Colors.white,
                   size: 24,
                 ),
-                onPressed: post.comments?.isNotEmpty == true ? onComment : null,
+                onPressed: onComment,
               ),
               IconButton(
                 icon: const Icon(
