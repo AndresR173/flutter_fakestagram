@@ -33,12 +33,11 @@ class LoginChangeNotifier extends ChangeNotifier {
     _password = password;
   }
 
-
   Future<void> login() async {
     _loginActionState = FutureState.wait;
     notifyListeners();
 
-    if (_email == null || _password == null) {
+    if (_email == null && _password == null) {
       _loginActionState = FutureState.failure;
       _error = Exception('Email and password cannot be null');
       notifyListeners();

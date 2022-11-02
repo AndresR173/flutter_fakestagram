@@ -16,15 +16,9 @@ class PostsChangeNotifier extends ChangeNotifier {
   FutureState _getPostsState = FutureState.none;
 
   FutureState get fetchPostsState => _getPostsState;
-  dynamic _error;
+  Object? _error;
 
-  dynamic get error => _error;
-
-  void init() {
-    _posts = [];
-    _getPostsState = FutureState.wait;
-    _error = null;
-  }
+  Object? get error => _error;
 
   Future<void> getPosts() async {
     _getPostsState = FutureState.wait;
@@ -32,7 +26,6 @@ class PostsChangeNotifier extends ChangeNotifier {
     try {
       _posts = await _repository.getPosts();
       _getPostsState = FutureState.success;
-
     } catch (e) {
       _getPostsState = FutureState.failure;
       _error = e;
@@ -41,6 +34,7 @@ class PostsChangeNotifier extends ChangeNotifier {
   }
 
   Future<void> likePost(Post post) => _repository.likePost(post);
+
   Future<void> getPostsNoWait() async {
     try {
       _posts = await _repository.getPosts();
@@ -50,7 +44,6 @@ class PostsChangeNotifier extends ChangeNotifier {
     }
     notifyListeners();
   }
-
 
   Future<void> deleteSession() => _repository.deleteAccessToken();
 }

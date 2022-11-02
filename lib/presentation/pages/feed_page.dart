@@ -20,7 +20,11 @@ class FeedPage extends StatefulWidget {
   State<FeedPage> createState() => _FeedPageState();
 }
 
-class _FeedPageState extends State<FeedPage> {
+class _FeedPageState extends State<FeedPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
@@ -44,11 +48,14 @@ class _FeedPageState extends State<FeedPage> {
           );
         } else {
           if (!mounted) return;
-          showGenericDialog(context, 'error: ${changeNotifier.error}', title: 'Error');
+          showGenericDialog(
+            context,
+            'error: ${changeNotifier.error}',
+            title: 'Error',
+          );
         }
       }
     });
-    changeNotifier.init();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       changeNotifier.getPosts();
     });
@@ -56,6 +63,7 @@ class _FeedPageState extends State<FeedPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
       body: Consumer<PostsChangeNotifier>(
@@ -67,16 +75,16 @@ class _FeedPageState extends State<FeedPage> {
                 final post = posts[index];
                 return PostCard(
                   post: post,
-                  onComment: () async {
-                    final commentWasAdded = await Navigator.push(
+                  onComment: () {
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => CommentsPage(post: post),
+                        builder: (_) => CommentsPage(
+                          post: post,
+                          onPostAdded: () => changeNotifier.getPosts(),
+                        ),
                       ),
                     );
-                    if (commentWasAdded) {
-                      await changeNotifier.getPosts();
-                    }
                   },
                   onLike: () async {
                     await changeNotifier.likePost(post);

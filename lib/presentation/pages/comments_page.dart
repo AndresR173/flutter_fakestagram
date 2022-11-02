@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/comment.dart';
+import '../../data/repository.dart';
 import '../../models/post.dart';
 import '../../utils/assets.dart';
 import '../change_notifiers/comments_change_notifier.dart';
@@ -14,11 +14,9 @@ import '../widgets/progress_widget.dart';
 
 class CommentsPage extends StatefulWidget {
   final Post post;
+  final VoidCallback? onPostAdded;
 
-  const CommentsPage({
-    super.key,
-    required this.post,
-  });
+  const CommentsPage({super.key, required this.post, this.onPostAdded});
 
   @override
   State<CommentsPage> createState() => _CommentsPageState();
@@ -26,6 +24,7 @@ class CommentsPage extends StatefulWidget {
 
 class _CommentsPageState extends State<CommentsPage> {
   final _commentController = TextEditingController();
+  late CommentsChangeNotifier _changeNotifier;
 
   @override
   void dispose() {
@@ -36,30 +35,32 @@ class _CommentsPageState extends State<CommentsPage> {
   @override
   void initState() {
     super.initState();
-    final changeNotifier = context.read<CommentsChangeNotifier>();
-    changeNotifier.addListener(() {
-     if (changeNotifier.getCommentsState == FutureState.failure ||
-          changeNotifier.postCommentsState == FutureState.failure) {
+    _changeNotifier = CommentsChangeNotifier(
+      context.read<FakestagramRepository>(),
+    );
+    _changeNotifier.postId = widget.post.id;
+    _changeNotifier.addListener(() {
+      if (_changeNotifier.getCommentsState == FutureState.failure ||
+          _changeNotifier.postCommentsState == FutureState.failure) {
         if (!mounted) return;
-        showGenericDialog(context, 'error: ${changeNotifier.error}', title: 'Error');
+        showGenericDialog(
+          context,
+          'error: ${_changeNotifier.error}',
+          title: 'Error',
+        );
       }
     });
-    changeNotifier.init();
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      changeNotifier.getComments(widget.post.id);
+      _changeNotifier.getComments();
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        final changeNotifier = context.read<CommentsChangeNotifier>();
-        Navigator.pop(context, changeNotifier.commentWasAdded);
-        return false;
-      },
-      child: Scaffold(
+    return ChangeNotifierProvider(
+      create: (_) => _changeNotifier,
+      builder: (context, child) {
+        return Scaffold(
           backgroundColor: AppColors.primaryColor,
           appBar: FakestagramAppBar(
             title: 'Comments',
@@ -73,13 +74,17 @@ class _CommentsPageState extends State<CommentsPage> {
                   height: 10,
                 ),
                 Expanded(
-                  child: Consumer<CommentsChangeNotifier>(builder: (_, changeNotifier, __) {
-                    if (changeNotifier.getCommentsState == FutureState.success) {
+                  child: Consumer<CommentsChangeNotifier>(
+                      builder: (_, changeNotifier, __) {
+                    if (changeNotifier.getCommentsState ==
+                        FutureState.success) {
                       return ListView.separated(
                         separatorBuilder: (_, __) => const SizedBox(
                           height: 5,
                         ),
-                        itemBuilder: (_, index) => CommentCard(comment: changeNotifier.comments[index]),
+                        itemBuilder: (_, index) => CommentCard(
+                          comment: changeNotifier.comments[index],
+                        ),
                         itemCount: changeNotifier.comments.length,
                       );
                     } else {
@@ -111,19 +116,24 @@ class _CommentsPageState extends State<CommentsPage> {
                       ),
                       const SizedBox(width: 10),
                       IconButton(
-                          onPressed: () async {
-                            final changeNotifier = context.read<CommentsChangeNotifier>();
-                            await changeNotifier.postComment(widget.post.id, _commentController.text);
-                            _commentController.clear();
-                            await changeNotifier.getComments(widget.post.id);
-                          },
-                          icon: const Icon(Icons.send, color: Colors.white)),
+                        onPressed: () async {
+                          final changeNotifier =
+                              context.read<CommentsChangeNotifier>();
+                          await changeNotifier.postComment(
+                              widget.post.id, _commentController.text);
+                          _commentController.clear();
+                          widget.onPostAdded?.call();
+                        },
+                        icon: const Icon(Icons.send, color: Colors.white),
+                      ),
                     ],
                   ),
                 )
               ],
             ),
-          )),
+          ),
+        );
+      },
     );
   }
 }

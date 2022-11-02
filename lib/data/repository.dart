@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:fakestagram/models/comment.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/auth_token.dart';
+import '../models/comment.dart';
 import '../models/post.dart';
 import '../models/unauthorized_exception.dart';
 import '../models/user_account.dart';
@@ -19,7 +19,8 @@ class FakestagramRepository {
   FakestagramRepository(this._sharedPreferences);
 
   Future<List<Post>> getPosts() async {
-    final url = Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
+    final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
     final response = await http.get(
       url,
       headers: await _getHeaders(),
@@ -60,7 +61,8 @@ class FakestagramRepository {
   }
 
   Future<bool> postNewEntry(Post post) async {
-    final url = Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
+    final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post');
     final response = await http.post(
       url,
       headers: await _getHeaders(),
@@ -110,8 +112,8 @@ class FakestagramRepository {
   }
 
   Future<bool> modifyPost(Post post) async {
-    final url =
-        Uri.parse('https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post/${post.id}');
+    final url = Uri.parse(
+        'https://firestore.googleapis.com/v1/projects/fir-sandbox2-e7601/databases/(default)/documents/Post/${post.id}');
     final headers = await _getHeaders();
     final likesList = post.likedBy?.map((e) => {'stringValue': e}).toList();
     final response = await http.patch(
@@ -133,7 +135,8 @@ class FakestagramRepository {
     return response.statusCode == 200;
   }
 
-  Future<void> saveAccessToken(AuthToken token) => _sharedPreferences.setString(tokenPreferenceKey, jsonEncode(token));
+  Future<void> saveAccessToken(AuthToken token) =>
+      _sharedPreferences.setString(tokenPreferenceKey, jsonEncode(token));
 
   Future<AuthToken?> getAccessToken() async {
     final tokenJson = _sharedPreferences.getString(tokenPreferenceKey);
@@ -174,7 +177,8 @@ class FakestagramRepository {
   }
 
   Future<bool> createAccount(String email, String password) async {
-    final url = Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCXo4VVDGqt0GmuklBvuYHPD3y72LVG4cg');
+    final url = Uri.parse(
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCXo4VVDGqt0GmuklBvuYHPD3y72LVG4cg');
     final response = await http.post(
       url,
       body: {
@@ -221,7 +225,9 @@ class FakestagramRepository {
     List<String> likedByList;
     try {
       likedByList =
-          (data['fields']['likedBy']['arrayValue']['values'] as List<dynamic>).map((e) => e['stringValue'] as String).toList();
+          (data['fields']['likedBy']['arrayValue']['values'] as List<dynamic>)
+              .map((e) => e['stringValue'] as String)
+              .toList();
     } catch (e) {
       likedByList = [];
     }
@@ -255,11 +261,12 @@ class FakestagramRepository {
     return token != null;
   }
 
-  Future<void> saveUserAccount(UserAccount userAccount) =>
-      _sharedPreferences.setString(userAccountPreferenceKey, jsonEncode(userAccount));
+  Future<void> saveUserAccount(UserAccount userAccount) => _sharedPreferences
+      .setString(userAccountPreferenceKey, jsonEncode(userAccount));
 
   Future<UserAccount?> getUserAccount() async {
-    final userAccountJson = _sharedPreferences.getString(userAccountPreferenceKey);
+    final userAccountJson =
+        _sharedPreferences.getString(userAccountPreferenceKey);
     if (userAccountJson == null) return null;
     return UserAccount.fromJson(jsonDecode(userAccountJson));
   }

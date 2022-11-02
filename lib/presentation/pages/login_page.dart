@@ -35,7 +35,11 @@ class _LoginPageState extends State<LoginPage> {
         case FutureState.failure:
           if (!mounted) return;
           Navigator.pop(context);
-          showGenericDialog(context, 'error: ${provider.error}', title: 'Error');
+          showGenericDialog(
+            context,
+            'error: ${provider.error}',
+            title: 'Error',
+          );
           break;
         case FutureState.wait:
           if (!mounted) return;
@@ -54,59 +58,62 @@ class _LoginPageState extends State<LoginPage> {
         color: Colors.white,
         child: Consumer<LoginChangeNotifier>(builder: (_, changeNotifier, __) {
           return Center(
-              child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(Assets.logo, height: 50),
-                const SizedBox(height: 30),
-                TextField(
-                  onChanged: (text) => changeNotifier.setEmail(text),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Email',
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  obscureText: true,
-                  onChanged: (text) => changeNotifier.setPassword(text),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  child: const Text('Login'),
-                  onPressed: () => changeNotifier.login(),
-                ),
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Don\'t have an account?'),
-                    const SizedBox(width: 5),
-                    TextButton(
-                      onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const CreateAccountPage(),
-                          )),
-                      child: const Text(
-                        'Create Account',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
+                    Image.asset(Assets.logo, height: 50),
+                    const SizedBox(height: 30),
+                    TextField(
+                      onChanged: (text) => changeNotifier.setEmail(text),
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Email',
                       ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      obscureText: true,
+                      onChanged: (text) => changeNotifier.setPassword(text),
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Password',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      child: const Text('Login'),
+                      onPressed: () => changeNotifier.login(),
+                    ),
+                    const SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Don\'t have an account?'),
+                        const SizedBox(width: 5),
+                        TextButton(
+                          onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const CreateAccountPage(),
+                              )),
+                          child: const Text(
+                            'Create Account',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ));
+          );
         }),
       ),
     );

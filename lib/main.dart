@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/repository.dart';
 import 'presentation/change_notifiers/account_change_notifier.dart';
-import 'presentation/change_notifiers/comments_change_notifier.dart';
 import 'presentation/change_notifiers/create_account_change_notifier.dart';
 import 'presentation/change_notifiers/login_change_notifier.dart';
 import 'presentation/change_notifiers/posts_change_notifier.dart';
@@ -25,12 +24,17 @@ class MyApp extends StatelessWidget {
   final FakestagramRepository repository;
   final bool isLoggedIn;
 
-  const MyApp({super.key, required this.repository, required this.isLoggedIn});
+  const MyApp({
+    super.key,
+    required this.repository,
+    required this.isLoggedIn,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<FakestagramRepository>(create: (_) => repository),
         ChangeNotifierProvider<PostsChangeNotifier>(
           create: (_) => PostsChangeNotifier(repository),
         ),
@@ -43,9 +47,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<CreateAccountChangeNotifier>(
           create: (_) => CreateAccountChangeNotifier(repository),
         ),
-        ChangeNotifierProvider<CommentsChangeNotifier>(
-          create: (_) => CommentsChangeNotifier(repository),
-        )
       ],
       child: MaterialApp(
         title: 'Fakestagram',

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../models/post.dart';
-import 'likes.dart';
 import 'random_image.dart';
 import 'user_image.dart';
 
@@ -30,8 +29,7 @@ class PostCard extends StatelessWidget {
           buildHeader(),
           buildImage(),
           buildActions(),
-          if (post.getLikesCount() > 0)
-          buildLikes(),
+          if (post.getLikesCount() > 0) buildLikes(),
           if (post.comments?.isNotEmpty == true) buildComments(),
         ],
       ),
@@ -41,7 +39,9 @@ class PostCard extends StatelessWidget {
   Widget buildImage() {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: RandomImage(media: 'https://picsum.photos/id/${Random().nextInt(80)}/200'),
+      child: RandomImage(
+        media: 'https://picsum.photos/id/${Random().nextInt(80)}/200',
+      ),
     );
   }
 
@@ -61,7 +61,10 @@ class PostCard extends StatelessWidget {
               ),
               const Text(
                 'User name',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16),
               ),
             ],
           ),
@@ -127,19 +130,22 @@ class PostCard extends StatelessWidget {
       padding: const EdgeInsets.only(left: 20, top: 5),
       child: Text(
         "${post.getLikesCount()} likes",
-        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        style:
+            const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }
 
-  Widget buildComments() => Padding(
-        padding: const EdgeInsets.only(left: 20, top: 5),
-        child: TextButton(
-          onPressed: post.comments?.isNotEmpty == true ? onComment : null,
-          child: Text(
-            'View all ${post.comments?.length} comments',
-            style: const TextStyle(color: Colors.white),
-          ),
+  Widget buildComments() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 5),
+      child: TextButton(
+        onPressed: post.comments?.isNotEmpty == true ? onComment : null,
+        child: Text(
+          'View all ${post.comments?.length} comments',
+          style: const TextStyle(color: Colors.white),
         ),
-      );
+      ),
+    );
+  }
 }
