@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/auth_token.dart';
@@ -276,4 +278,33 @@ class FakestagramRepository {
   }
 
   UserAccount? getAccountEmail() => _account;
+
+  Future<String?> processAndDispatchImage({
+    required ImageSource imageSource,
+  }) async {
+
+    final imagePicker = ImagePicker();
+    final pickedFilePath = await imagePicker
+        .pickImage(
+      source: imageSource,
+    )
+        .then((xfile) => xfile?.path);
+    if (pickedFilePath == null) return null;
+    final base64 =
+    await compressAndEncodeImageAsBase64(pickedFilePath);
+    if (base64 == null) return null;
+    return base64;
+
+  }
+
+  Future<String?> compressAndEncodeImageAsBase64(String filePath) async {
+    var result = await FlutterImageCompress.compressWithFile(
+      filePath,
+      minWidth: 800,
+      minHeight: 800,
+      quality: 60,
+    );
+
+    return result != null ? base64Encode(result) : null;
+  }
 }

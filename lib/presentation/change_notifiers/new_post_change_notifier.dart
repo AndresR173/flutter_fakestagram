@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../data/repository.dart';
 import 'future_state.dart';
@@ -37,27 +38,33 @@ class NewPostChangeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String?> compressAndEncodeImageAsBase64(String filePath) async {
-    var result = await FlutterImageCompress.compressWithFile(
-      filePath,
-      minWidth: 1300,
-      minHeight: 1300,
-      quality: 70,
-    );
+  Future<void> captureImageAndProcess({
+    required ImageSource imageSource,
+    required ValueChanged<String?> onSuccess,
+    required ValueChanged<Object> onFailure,
+  }) async {
+    _pickedImageState = FutureState.wait;
+    notifyListeners();
 
-    return result != null ? base64Encode(result) : null;
+    try {
+      final base64Image = await _repository.processAndDispatchImage(imageSource: imageSource);
+      _pickedImageState = FutureState.success;
+      onSuccess(base64Image);
+    } catch (e) {
+      _pickedImageState = FutureState.failure;
+      onFailure(e);
+    } finally {
+      notifyListeners();
+    }
   }
 
-  Future<void> makePost(
-      {required VoidCallback onPostSuccess,
-      required ValueChanged<Object> onPostFailure}) async {
+  Future<void> makePost({required VoidCallback onPostSuccess, required ValueChanged<Object> onPostFailure}) async {
     try {
-      if (_imageBase64 == null || _headerText == null) {
+      if (_imageBase64?.isEmpty == true || _headerText?.isEmpty == true) {
         throw Exception('image or text is empty');
       }
 
-      await _repository.postNewEntry(
-          imageBase64: _imageBase64!, header: _headerText!);
+      await _repository.postNewEntry(imageBase64: _imageBase64!, header: _headerText!);
       setPickedImageState(FutureState.success);
       onPostSuccess();
     } catch (e) {

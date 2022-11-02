@@ -114,8 +114,9 @@ class _NewPostPageState extends State<NewPostPage> {
 
   Future<void> pickPhoto({
     required BuildContext context,
-    required void Function(String base64) onImagePicked,
+    required void Function(String? base64) onImagePicked,
   }) async {
+    final changeNotifier = context.read<NewPostChangeNotifier>();
     await showGenericBottomSheet(
       context: context,
       builder: (_) => Padding(
@@ -136,11 +137,21 @@ class _NewPostPageState extends State<NewPostPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 MaterialButton(
-                  onPressed: () async {
-                    await processAndDispatchImage(
-                      context: context,
+                  onPressed: () {
+                    changeNotifier.captureImageAndProcess(
                       imageSource: ImageSource.camera,
-                      onImagePicked: onImagePicked,
+                      onSuccess: (imageBase64) {
+                        Navigator.pop(context);
+                        onImagePicked(imageBase64);
+                      },
+                      onFailure: (error) {
+                        Navigator.pop(context);
+                        showGenericDialog(
+                          context,
+                          'error: ${error.toString()}',
+                          title: 'Error',
+                        );
+                      },
                     );
                   },
                   child: Column(
@@ -160,11 +171,22 @@ class _NewPostPageState extends State<NewPostPage> {
                 ),
                 const SizedBox(width: 20),
                 MaterialButton(
-                  onPressed: () async {
-                    await processAndDispatchImage(
-                        context: context,
-                        imageSource: ImageSource.gallery,
-                        onImagePicked: onImagePicked);
+                  onPressed: () {
+                    changeNotifier.captureImageAndProcess(
+                      imageSource: ImageSource.gallery,
+                      onSuccess: (imageBase64) {
+                        Navigator.pop(context);
+                        onImagePicked(imageBase64);
+                      },
+                      onFailure: (error) {
+                        Navigator.pop(context);
+                        showGenericDialog(
+                          context,
+                          'error: ${error.toString()}',
+                          title: 'Error',
+                        );
+                      },
+                    );
                   },
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -187,30 +209,5 @@ class _NewPostPageState extends State<NewPostPage> {
         ),
       ),
     );
-  }
-
-  Future<void> processAndDispatchImage({
-    required BuildContext context,
-    required ImageSource imageSource,
-    required void Function(String base64) onImagePicked,
-  }) async {
-    try {
-      _changeNotifier.setPickedImageState(FutureState.wait);
-      final imagePicker = ImagePicker();
-      final pickedFilePath = await imagePicker
-          .pickImage(
-            source: imageSource,
-          )
-          .then((xfile) => xfile?.path);
-      if (pickedFilePath == null) return;
-      final base64 =
-          await _changeNotifier.compressAndEncodeImageAsBase64(pickedFilePath);
-      Navigator.pop(context);
-      if (base64 == null) return;
-      _changeNotifier.setPickedImageState(FutureState.success);
-      onImagePicked(base64);
-    } catch (ex) {
-      await showGenericDialog(context, ex.toString(), title: 'error');
-    }
   }
 }

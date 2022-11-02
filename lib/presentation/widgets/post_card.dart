@@ -28,6 +28,7 @@ class PostCard extends StatelessWidget {
           buildHeader(),
           buildImage(),
           buildActions(),
+          buildText(),
           if (post.getLikesCount() > 0) buildLikes(),
           if (post.comments?.isNotEmpty == true) buildComments(),
         ],
@@ -40,6 +41,26 @@ class PostCard extends StatelessWidget {
       padding: const EdgeInsets.only(top: 10, bottom: 10),
       child: Image.memory(base64Decode(post.imageBase64)),
     );
+  }
+
+  Widget buildText() {
+    return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 10, left: 10),
+        child: Row(
+          children: [
+            Text(
+              post.author,
+              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            const SizedBox(width: 5),
+            Expanded(
+              child: Text(
+                post.header,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ));
   }
 
   Widget buildHeader() {
@@ -58,10 +79,7 @@ class PostCard extends StatelessWidget {
               ),
               Text(
                 post.author,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ],
           ),
@@ -124,18 +142,17 @@ class PostCard extends StatelessWidget {
 
   Widget buildLikes() {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, top: 5),
+      padding: const EdgeInsets.only(left: 10, top: 5),
       child: Text(
         "${post.getLikesCount()} likes",
-        style:
-            const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }
 
   Widget buildComments() {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, top: 5),
+      padding: const EdgeInsets.only(left: 5),
       child: TextButton(
         onPressed: post.comments?.isNotEmpty == true ? onComment : null,
         child: Text(
