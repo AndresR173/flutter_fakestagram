@@ -71,8 +71,7 @@ class _NewPostPageState extends State<NewPostPage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Consumer<NewPostChangeNotifier>(
-                    builder: (_, changeNotifier, __) {
+                Consumer<NewPostChangeNotifier>(builder: (_, changeNotifier, __) {
                   if (changeNotifier.pickedImageState == FutureState.wait) {
                     return const CircularProgressIndicator();
                   } else {
@@ -85,11 +84,8 @@ class _NewPostPageState extends State<NewPostPage> {
                       child: ColoredBox(
                         color: Colors.white,
                         child: changeNotifier.imageBase64 != null
-                            ? Image.memory(
-                                base64Decode(changeNotifier.imageBase64!),
-                                height: 80)
-                            : Image.asset(Assets.picturePlaceholder,
-                                height: 80),
+                            ? Image.memory(base64Decode(changeNotifier.imageBase64!), height: 80)
+                            : Image.asset(Assets.picturePlaceholder, height: 80),
                       ),
                     );
                   }
@@ -114,24 +110,15 @@ class _NewPostPageState extends State<NewPostPage> {
     );
   }
 
-  Future<bool> askForCameraPermission() async {
-    final permissionStatus = await Permission.camera.status;
-    if (permissionStatus.isGranted) {
-      return true;
-    } else {
-      final result = await Permission.camera.request();
-      return result == PermissionStatus.granted;
+  Future<PermissionStatus> askForPermission({
+    required BuildContext context,
+    required Permission permission,
+  }) async {
+    PermissionStatus status = await permission.status;
+    if (status.isDenied) {
+      status = await permission.request();
     }
-  }
-
-  Future<bool> askForImageGalleryPermission() async {
-    final permissionStatus = await Permission.photos.status;
-    if (permissionStatus.isGranted) {
-      return true;
-    } else {
-      final result = await Permission.photos.request();
-      return result == PermissionStatus.granted;
-    }
+    return status;
   }
 
   Future<void> pickPhoto({
@@ -161,8 +148,16 @@ class _NewPostPageState extends State<NewPostPage> {
                 MaterialButton(
                   onPressed: () async {
                     if (Platform.isIOS) {
-                      final permissionWasGranted = await askForCameraPermission();
-                      if (!permissionWasGranted) return;
+                      final permissionStatus = await askForPermission(
+                        context: context,
+                        permission: Permission.camera,
+                      );
+
+                      if (permissionStatus == PermissionStatus.permanentlyDenied) {
+                        await openAppSettings();
+                        Navigator.pop(context);
+                        return;
+                      }
                     }
                     await changeNotifier.captureImageAndProcess(
                       imageSource: ImageSource.camera,
@@ -199,8 +194,16 @@ class _NewPostPageState extends State<NewPostPage> {
                 MaterialButton(
                   onPressed: () async {
                     if (Platform.isIOS) {
-                      final permissionWasGranted = await askForImageGalleryPermission();
-                      if (!permissionWasGranted) return;
+                      final permissionStatus = await askForPermission(
+                        context: context,
+                        permission: Permission.camera,
+                      );
+
+                      if (permissionStatus == PermissionStatus.permanentlyDenied) {
+                        await openAppSettings();
+                        Navigator.pop(context);
+                        return;
+                      }
                     }
                     await changeNotifier.captureImageAndProcess(
                       imageSource: ImageSource.gallery,
