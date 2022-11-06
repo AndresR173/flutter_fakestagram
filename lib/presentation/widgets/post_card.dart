@@ -1,61 +1,85 @@
-import 'dart:math';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
 import '../../models/post.dart';
-import 'likes.dart';
-import 'random_image.dart';
 import 'user_image.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
+  final VoidCallback onComment;
+  final VoidCallback onLike;
 
   const PostCard({
     super.key,
     required this.post,
+    required this.onComment,
+    required this.onLike,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 15),
-      child: Column(children: <Widget>[
-        buildHeader(),
-        buildImage(),
-        buildActions(),
-        buildLikes()
-      ]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildHeader(),
+          buildImage(),
+          buildActions(),
+          buildText(),
+          if (post.getLikesCount() > 0) buildLikes(),
+          if (post.comments?.isNotEmpty == true) buildComments(),
+        ],
+      ),
     );
   }
 
   Widget buildImage() {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: RandomImage(
-          media: 'https://picsum.photos/id/${Random().nextInt(80)}/200'),
+      child: Image.memory(base64Decode(post.imageBase64)),
     );
+  }
+
+  Widget buildText() {
+    return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 10, left: 10),
+        child: Row(
+          children: [
+            Text(
+              post.author,
+              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            const SizedBox(width: 5),
+            Expanded(
+              child: Text(
+                post.header,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ));
   }
 
   Widget buildHeader() {
     return Row(
-      children: <Widget>[
+      children: [
         Expanded(
           child: Row(
-            children: <Widget>[
+            children: [
               Padding(
                 padding: const EdgeInsets.only(right: 8, left: 20),
                 child: UserImage(
-                  image: post.avatar,
+                  image: post.avatar ?? '',
                   radio: 16,
                   width: 38,
                 ),
               ),
-              const Text(
-                'User name',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16),
+              Text(
+                post.author,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ],
           ),
@@ -73,30 +97,33 @@ class PostCard extends StatelessWidget {
 
   Widget buildActions() {
     return Row(
-      children: <Widget>[
+      children: [
         Expanded(
           child: Row(
-            children: const <Widget>[
-              Padding(
-                padding: EdgeInsets.only(right: 10, left: 20),
-                child: Icon(
-                  Icons.favorite_border,
+            children: [
+              IconButton(
+                icon: Icon(
+                  post.isLiked == true ? Icons.favorite : Icons.favorite_border,
                   color: Colors.white,
                   size: 24,
                 ),
+                onPressed: onLike,
               ),
-              Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: Icon(
+              IconButton(
+                icon: const Icon(
                   Icons.chat_bubble_outline,
                   color: Colors.white,
                   size: 24,
                 ),
+                onPressed: onComment,
               ),
-              Icon(
-                Icons.send,
-                color: Colors.white,
-                size: 24,
+              IconButton(
+                icon: const Icon(
+                  Icons.send,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: () {},
               ),
             ],
           ),
@@ -114,13 +141,25 @@ class PostCard extends StatelessWidget {
   }
 
   Widget buildLikes() {
-    return Row(
-      children: const <Widget>[
-        Padding(
-          padding: EdgeInsets.only(left: 20, top: 5),
-          child: Likes(),
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, top: 5),
+      child: Text(
+        "${post.getLikesCount()} likes",
+        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget buildComments() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 5),
+      child: TextButton(
+        onPressed: post.comments?.isNotEmpty == true ? onComment : null,
+        child: Text(
+          'View all ${post.comments?.length} comments',
+          style: const TextStyle(color: Colors.white),
         ),
-      ],
+      ),
     );
   }
 }

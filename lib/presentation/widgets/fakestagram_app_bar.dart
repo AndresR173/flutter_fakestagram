@@ -3,20 +3,25 @@ import 'package:flutter/material.dart';
 import '../../utils/assets.dart';
 
 class FakestagramAppBar extends AppBar {
-  FakestagramAppBar({super.key, bool hideButtons = false})
+  FakestagramAppBar({super.key, bool hideButtons = false, String? title, VoidCallback? onNewPostPressed})
       : super(
           backgroundColor: AppColors.primaryColor,
           centerTitle: false,
-          title: Image.asset(
-            Assets.titleImage,
-            height: 33,
-          ),
+          title: title?.isNotEmpty == true
+              ? Text(title!)
+              : Image.asset(
+                  Assets.titleImage,
+                  height: 33,
+                ),
           actions: hideButtons
               ? null
               : <Widget>[
-                  Image.asset(
-                    Assets.addOutline,
-                    height: 20,
+                  IconButton(
+                    icon: Image.asset(
+                      Assets.addOutline,
+                      height: 20,
+                    ),
+                    onPressed: onNewPostPressed,
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),

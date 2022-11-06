@@ -54,7 +54,7 @@ Future<T?> showGenericDialog<T>(
     context: context,
     builder: (_) => AlertDialog(
       title: Text(title),
-      content: Text(message),
+      content: SingleChildScrollView(child: Text(message)),
       actions: <Widget>[
         TextButton(
           child: Text(continueButtonLabel),

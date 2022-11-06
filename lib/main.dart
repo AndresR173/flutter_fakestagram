@@ -24,12 +24,17 @@ class MyApp extends StatelessWidget {
   final FakestagramRepository repository;
   final bool isLoggedIn;
 
-  const MyApp({super.key, required this.repository, required this.isLoggedIn});
+  const MyApp({
+    super.key,
+    required this.repository,
+    required this.isLoggedIn,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<FakestagramRepository>(create: (_) => repository),
         ChangeNotifierProvider<PostsChangeNotifier>(
           create: (_) => PostsChangeNotifier(repository),
         ),
@@ -41,7 +46,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<CreateAccountChangeNotifier>(
           create: (_) => CreateAccountChangeNotifier(repository),
-        )
+        ),
       ],
       child: MaterialApp(
         title: 'Fakestagram',
